@@ -2,6 +2,7 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -12,14 +13,30 @@ import {
 
 import stylesheet from "~/tailwind.css";
 
+function NavBar() {
+  return (
+    <nav className="bg-blue-500 p-4">
+      <ul className="flex space-x-4">
+        <Link to="/" className="text-white">
+          Home
+        </Link>
+
+        <Link to="/projects" className="text-white">
+          Projects
+        </Link>
+      </ul>
+    </nav>
+  );
+}
+
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-export const loader = async ({ request }: LoaderArgs) => {
-  return json({ message: `Hello from ${request.url}` });
-};
+// export const loader = async ({ request }: LoaderArgs) => {
+//   return json({ message: `Hello from ${request.url}` });
+// };
 
 export default function App() {
   return (
@@ -30,11 +47,12 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
-        <Outlet />
-        <ScrollRestoration />
+      <body>
+        <NavBar />
+        <div>
+          <Outlet />
+        </div>
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
