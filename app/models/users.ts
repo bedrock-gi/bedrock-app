@@ -10,6 +10,7 @@ export async function getUser(userId: string) {
 }
 
 export async function getOrCreateUser(email: string) {
+  console.log("email", email);
   return await prisma.user.upsert({
     where: {
       email,

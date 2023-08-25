@@ -1,7 +1,7 @@
 // app/utils/auth.server.ts
 import { Authenticator } from "remix-auth";
 import { Auth0Strategy } from "remix-auth-auth0";
-import { getOrCreateUser } from "~/models/user";
+import { getOrCreateUser } from "~/models/users";
 import { User } from "@prisma/client";
 import { sessionStorage } from "~/services/session.server";
 
@@ -33,7 +33,7 @@ let auth0Strategy = new Auth0Strategy(
     }
 
     // Get the user data from your DB or API using the tokens and profile
-    return getOrCreateUser(profile.emails[0].value);
+    return await getOrCreateUser(profile.emails[0].value);
   }
 );
 

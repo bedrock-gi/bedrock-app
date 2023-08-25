@@ -14,8 +14,9 @@ export const action = (async ({ request }) => {
 
   const formData = await request.formData();
   const projectName = formData.get("projectName") as string;
+  const description = formData.get("description") as string;
 
-  await createProject(user.id, projectName);
+  await createProject(user.id, projectName, description);
 
   return redirect(`/projects`);
 }) satisfies ActionFunction;
@@ -33,6 +34,13 @@ export default function CreateProject() {
             type="text"
             id="projectName"
             name="projectName"
+            className="w-full border p-2"
+            required
+          />
+          <input
+            type="text"
+            id="description"
+            name="description"
             className="w-full border p-2"
             required
           />

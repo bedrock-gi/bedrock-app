@@ -4,21 +4,18 @@ import { prisma } from "../db.server";
 import { Project, User } from "@prisma/client";
 import { authenticator, requireUser } from "~/utils/auth.server";
 
-// Loader function to fetch projects from the database
+import { getProjects } from "~/models/projects";
+
 export const loader = (async ({ request }) => {
   const user = await requireUser(request);
 
-  const projects = await prisma.project.findMany({
-    where: { userId: user.id },
-    include: { user: true },
-  });
+  const projects = await getProjects(user.id);
 
-  return json({ projects, user });
+  return json({ projects });
 }) satisfies LoaderFunction;
 
-// ProjectsList component
-export default function ProjectsList() {
-  const { projects, user } = useLoaderData<typeof loader>();
+export default function () {
+  const { projects } = useLoaderData<typeof loader>();
 
   return (
     <div>

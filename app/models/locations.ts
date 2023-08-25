@@ -8,11 +8,3 @@ export async function getLocations(projectId: string) {
     },
   });
 }
-
-export async function getProjects(userId: string) {
-  return await prisma.project.findMany({
-    where: {
-      userId,
-    },
-  });
-}
