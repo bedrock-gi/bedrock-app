@@ -12,15 +12,12 @@ import {
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
+import { requireUser } from "./utils/auth.server";
 
 function NavBar() {
   return (
     <nav className="bg-blue-500 p-4">
       <ul className="flex space-x-4">
-        <Link to="/" className="text-white">
-          Home
-        </Link>
-
         <Link to="/projects" className="text-white">
           Projects
         </Link>
@@ -33,10 +30,6 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
-
-// export const loader = async ({ request }: LoaderArgs) => {
-//   return json({ message: `Hello from ${request.url}` });
-// };
 
 export default function App() {
   return (

@@ -4,7 +4,7 @@ import { Outlet } from "@remix-run/react";
 export default function Projects() {
   return (
     <div>
-      <h1>Projects Page</h1>
+      <h1 className="mb-4 text-2xl font-bold">Projects</h1>
 
       <Outlet />
     </div>

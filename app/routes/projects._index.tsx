@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
 
 export const loader = () => {
-  return redirect("/projects/list");
+  return redirect("/projects/summary");
 };

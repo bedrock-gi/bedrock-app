@@ -7,13 +7,15 @@ import {
 import { Form } from "@remix-run/react";
 import { prisma } from "../db.server";
 import { createProject } from "~/models/projects";
+import { requireUser } from "~/utils/auth.server";
 
 export const action = (async ({ request }) => {
+  const user = await requireUser(request);
+
   const formData = await request.formData();
   const projectName = formData.get("projectName") as string;
 
-  const userId = "63b4c490-9507-4d34-9694-42ab32c66c03";
-  const project = await createProject(userId, projectName);
+  await createProject(user.id, projectName);
 
   return redirect(`/projects`);
 }) satisfies ActionFunction;
