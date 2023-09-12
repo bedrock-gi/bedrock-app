@@ -4,10 +4,11 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 import { prisma } from "../db.server";
 import { createProject } from "~/models/projects";
 import { requireUser } from "~/utils/auth.server";
+import LabeledInput from "~/components/LabeledInput";
 
 export const action = (async ({ request }) => {
   const user = await requireUser(request);
@@ -21,34 +22,30 @@ export const action = (async ({ request }) => {
   return redirect(`/projects`);
 }) satisfies ActionFunction;
 
+export const handle = {
+  breadcrumb: () => <Link to="/projects/create">Create</Link>,
+};
+
 export default function CreateProject() {
   return (
     <div className="container mx-auto p-8">
-      <h1 className="mb-4 text-2xl font-bold">Create a New Project</h1>
+      <h1 className="mb-4 text-2xl font-bold">New Project</h1>
       <Form method="post">
-        <div className="mb-4">
-          <label htmlFor="projectName" className="mb-1 block font-semibold">
-            Project Name
-          </label>
-          <input
-            type="text"
+        <div className="form-control mb-4">
+          <LabeledInput
+            label="Project Name"
             id="projectName"
             name="projectName"
-            className="w-full border p-2"
-            required
+            required={true}
           />
-          <input
-            type="text"
+          <LabeledInput
+            label="Description"
             id="description"
             name="description"
-            className="w-full border p-2"
-            required
+            required={true}
           />
         </div>
-        <button
-          type="submit"
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        >
+        <button type="submit" className="btn btn-primary">
           Create Project
         </button>
       </Form>

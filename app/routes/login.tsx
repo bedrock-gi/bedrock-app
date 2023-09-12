@@ -4,7 +4,7 @@ import { Form } from "@remix-run/react";
 export default function Login() {
   return (
     <Form action="/auth" method="post">
-      <button>Login with Auth0</button>
+      <button className="btn btn-primary">Login with Auth0</button>
     </Form>
   );
 }
