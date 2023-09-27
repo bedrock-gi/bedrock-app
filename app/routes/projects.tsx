@@ -16,7 +16,7 @@ export const handle = {
 
 export default function Projects() {
   return (
-    <div className="card m-2">
+    <div>
       <Outlet />
     </div>
   );

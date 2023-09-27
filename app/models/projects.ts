@@ -26,7 +26,6 @@ export async function createProject(
   name: string,
   description: string
 ) {
-  console.log("iserId", userId);
   return await prisma.userProject.create({
     data: {
       user: {

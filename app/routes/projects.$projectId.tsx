@@ -9,17 +9,14 @@ import {
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getProject } from "~/models/projects";
 
-export async function loader({ params }: LoaderArgs) {
+export const loader = async ({ params }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }
   const project = await getProject(params.projectId);
-  if (!project) {
-    return redirect("/projects");
-  }
 
   return typedjson({ project });
-}
+};
 
 export const handle = {
   breadcrumb: (match: RouteMatch) => {
@@ -33,13 +30,8 @@ export const handle = {
 };
 
 export default function () {
-  const { project } = useTypedLoaderData<typeof loader>();
-
   return (
     <div>
-      <Link className="btn btn-primary" to={`/projects/${project.id}/tables`}>
-        Tables
-      </Link>
       <Outlet />
     </div>
   );

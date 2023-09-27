@@ -14,25 +14,12 @@ import {
 
 import stylesheet from "~/tailwind.css";
 import { requireUser } from "./utils/auth.server";
+import { Breadcrumb } from "./components/Breadcrumb";
+import { Sidebar } from "./components/Sidebar";
 
 export interface BreadcrumbData {
   route: string;
   label: string;
-}
-
-function NavBar() {
-  return (
-    <nav className="navbar bg-primary text-white">
-      <ul className="flex space-x-4">
-        <Link to="/projects" className="">
-          Bedrock
-        </Link>
-        <Link to="/projects" className="">
-          Projects
-        </Link>
-      </ul>
-    </nav>
-  );
 }
 
 export const links: LinksFunction = () => [
@@ -44,7 +31,6 @@ if (process.env.NODE_ENV === "development") {
 } else {
 }
 export default function App() {
-  const matches = useMatches();
   return (
     <html data-theme="bedrock" lang="en" className="h-full">
       <head>
@@ -56,22 +42,12 @@ export default function App() {
       </head>
 
       <body>
-        <NavBar />
-        <div className="m-2">
-          <div className="breadcrumbs">
-            <ul>
-              {matches
-                // skip routes that don't have a breadcrumb
-                .filter((match) => match.handle && match.handle.breadcrumb)
-
-                // render breadcrumbs!
-                .map((match, index) => (
-                  <li key={index}>{match?.handle?.breadcrumb(match)}</li>
-                ))}
-            </ul>
+        <div className="flex h-screen flex-row">
+          <div className="h-full w-1/5">
+            <Sidebar></Sidebar>
           </div>
 
-          <div>
+          <div className="h-full w-4/5">
             <Outlet />
           </div>
         </div>
