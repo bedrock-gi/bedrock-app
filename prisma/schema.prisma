@@ -18,14 +18,15 @@ model User {
 }
 
 model UserProject {
-  id        String   @id @default(uuid())
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
+
+  @@id([userId, projectId])
 }
 
 model Project {
@@ -54,10 +55,10 @@ model Location {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  project   Project? @relation(fields: [projectId], references: [id])
-  projectId String?
-  easting   Int
-  northing  Int
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  latitude  Float
+  longitude Float
 }
 
 model Sample {

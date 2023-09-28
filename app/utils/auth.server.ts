@@ -4,11 +4,29 @@ import { Auth0Strategy } from "remix-auth-auth0";
 import { getOrCreateUser } from "~/models/users";
 import { User } from "@prisma/client";
 import { sessionStorage } from "~/services/session.server";
+import { LoaderArgs } from "@remix-run/node";
+import { getProjectRole } from "~/models/projects";
 
 export const requireUser = (request: Request) => {
   return authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
+};
+
+export const requireUserProjectRole = async (
+  request: Request,
+  projectId: string
+) => {
+  const user = await requireUser(request);
+  if (!user) {
+    return false;
+  }
+
+  if (!projectId) {
+    return false;
+  }
+
+  return (await getProjectRole(user.id, projectId)) || false;
 };
 
 // Create an instance of the authenticator, pass a generic with what your
@@ -33,7 +51,9 @@ let auth0Strategy = new Auth0Strategy(
     }
 
     // Get the user data from your DB or API using the tokens and profile
-    return await getOrCreateUser(profile.emails[0].value);
+    const user = await getOrCreateUser(profile.emails[0].value);
+    console.log("user", user);
+    return user;
   }
 );
 

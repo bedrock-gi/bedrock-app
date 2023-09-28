@@ -14,21 +14,19 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "UserProject" (
-    "id" TEXT NOT NULL,
     "role" "Role" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "projectId" TEXT NOT NULL,
 
-    CONSTRAINT "UserProject_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UserProject_pkey" PRIMARY KEY ("userId","projectId")
 );
 
 -- CreateTable
 CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
-    "nameShort" TEXT NOT NULL,
-    "nameLong" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -40,13 +38,22 @@ CREATE TABLE "Project" (
 CREATE TABLE "Location" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "easting" INTEGER NOT NULL,
-    "northing" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "projectId" TEXT,
+    "projectId" TEXT NOT NULL,
+    "latitude" INTEGER NOT NULL,
+    "longitude" INTEGER NOT NULL,
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Sample" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Sample_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -59,4 +66,4 @@ ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_userId_fkey" FOREIGN KEY (
 ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Location" ADD CONSTRAINT "Location_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Location" ADD CONSTRAINT "Location_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

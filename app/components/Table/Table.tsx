@@ -33,6 +33,7 @@ export function Table<T extends ObjectWithStringKeys>({
 
   return (
     <div className="overflow-y-scroll rounded-lg bg-white p-6 shadow-md">
+      <h1 className="text-2xl font-semibold">{tableConfig.title}</h1>
       <table className="w-full table-auto">
         <thead className="bg-gray-100">
           {table.getHeaderGroups().map((headerGroup) => (

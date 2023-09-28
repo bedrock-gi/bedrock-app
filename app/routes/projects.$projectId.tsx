@@ -7,15 +7,21 @@ import {
   useParams,
 } from "@remix-run/react";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
+import { json } from "stream/consumers";
 import { getProject } from "~/models/projects";
+import { requireUserProjectRole } from "~/utils/auth.server";
 
-export const loader = async ({ params }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }
-  const project = await getProject(params.projectId);
 
-  return typedjson({ project });
+  const role = await requireUserProjectRole(request, params.projectId);
+  if (!role) {
+    return redirect("/projects");
+  }
+
+  return typedjson({ role });
 };
 
 export const handle = {

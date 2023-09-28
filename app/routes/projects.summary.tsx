@@ -9,10 +9,11 @@ import { prisma } from "../db.server";
 import { Project, User } from "@prisma/client";
 import { authenticator, requireUser } from "~/utils/auth.server";
 
-import { getProjects } from "~/models/projects";
+import { getProjects, getProjectsWithLocations } from "~/models/projects";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Map } from "react-map-gl";
-import { MapView } from "~/components/Map";
+import { MapView } from "~/components/Map/Map";
+import ProjectsMap from "~/components/Map/ProjectsMap";
 
 const ProjectCard = ({ project }: { project: Project }) => {
   return (
@@ -36,7 +37,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireUser(request);
 
-  const projects = await getProjects(user.id);
+  const projects = await getProjectsWithLocations(user.id);
 
   return typedjson({ projects });
 };
@@ -60,7 +61,7 @@ export default function () {
       </div>
 
       <div className="h-screen">
-        <MapView />
+        <ProjectsMap projects={projects}></ProjectsMap>
       </div>
     </div>
   );
