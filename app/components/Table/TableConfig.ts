@@ -1,13 +1,6 @@
 import { createColumnHelper, AccessorFn } from "@tanstack/react-table";
-
-export type ObjectWithStringKeys = {
-  [key: string]: any;
-};
-
-type DataColumns<T extends ObjectWithStringKeys> = Omit<
-  T,
-  "createdAt" | "updatedAt" | "id"
->;
+import { ObjectWithStringKeys } from "~/models/config/mappings/mappingUtils";
+import { DataColumns } from "~/models/config/mappings/mappingUtils";
 
 export interface Column<T extends ObjectWithStringKeys> {
   label?: string;

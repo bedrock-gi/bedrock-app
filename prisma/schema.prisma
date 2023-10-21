@@ -3,6 +3,10 @@ generator client {
   binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
 }
 
+generator zod {
+  provider = "zod-prisma-types"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -40,7 +44,8 @@ model Project {
 
   locations    Location[]
   userProjects UserProject[]
-  // columnDefinitions ColumnDefinition[]
+
+  columnDefinitions ColumnDefinition[]
 }
 
 enum Role {
@@ -51,14 +56,15 @@ enum Role {
 }
 
 model Location {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
-  latitude  Float
-  longitude Float
+  id            String   @id @default(uuid())
+  name          String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String
+  latitude      Float?
+  longitude     Float?
+  customColumns Json?
 }
 
 model Sample {
@@ -67,19 +73,20 @@ model Sample {
   updatedAt DateTime @updatedAt
 }
 
-// model ColumnDefinition {
-//   id        String   @id @default(uuid())
-//   tableId   String
-//   projectId String
-//   project   Project  @relation(fields: [projectId], references: [id])
-//   name      String
-//   dataType  DataType
-// }
+model ColumnDefinition {
+  id        String   @id @default(uuid())
+  columnId  String
+  tableId   String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  label     String
+  dataType  DataType
+}
 
-// enum DataType {
-//   STRING
-//   NUMBER
-// }
+enum DataType {
+  STRING
+  NUMBER
+}
 
 // model LabTest {
 //   id            String   @id @default(uuid())

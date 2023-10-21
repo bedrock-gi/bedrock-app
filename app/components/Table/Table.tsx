@@ -8,11 +8,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import {
-  ObjectWithStringKeys,
-  TableConfig,
-  createColumns,
-} from "./TableConfig";
+import { TableConfig, createColumns } from "./TableConfig";
+import { ObjectWithStringKeys } from "~/models/config/mappings/mappingUtils";
 
 interface Props<T extends ObjectWithStringKeys> {
   data: T[];
