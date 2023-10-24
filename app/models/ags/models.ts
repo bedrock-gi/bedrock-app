@@ -35,8 +35,4 @@ export class Ags {
     this.agsData = parseAgs(agsString);
     validateAgsColumnLengths(this.agsData);
   }
-
-  getNumRecords() {
-    return Object.values(this.agsData)[0].columns[0].data.length;
-  }
 }

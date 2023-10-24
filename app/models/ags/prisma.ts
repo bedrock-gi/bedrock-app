@@ -1,12 +1,12 @@
 import { Ags } from "./models";
-import { mappings } from "../config/mappings";
+import { mappings } from "./mappings";
 import { prisma } from "~/db.server";
 import {
   AgsMapping,
   DataColumns,
   ObjectWithStringKeys,
   parseAgsGroup,
-} from "../config/mappings/mappingUtils";
+} from "./mappingUtils";
 
 type PrismaRecordCollection<T extends ObjectWithStringKeys> = {
   records: DataColumns<T>[];

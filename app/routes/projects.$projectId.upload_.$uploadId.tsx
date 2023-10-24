@@ -29,8 +29,6 @@ import {
   unlinkSync,
 } from "fs";
 import { loadAgsToPrisma } from "~/models/ags/prisma";
-import { v4 as uuidv4 } from "uuid";
-
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
@@ -40,54 +38,22 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 
   const role = await requireUserProjectRole(request, params.projectId);
   if (!role) {
-    console.log("redirecting");
     return redirect("/projects");
   }
 
   return typedjson({ role });
 };
 
-export const action = async ({ request }: ActionArgs) => {
-  console.log("action");
-  //   console.log("request", request);
-
-  const uploadHandler = unstable_composeUploadHandlers(
-    async ({ name, contentType, data, filename }) => {
-      const filePath = "temp.txt";
-      const writableStream = createWriteStream(filePath);
-
-      await writeAsyncIterableToWritable(data, writableStream);
-
-      const agsData = readFileSync(filePath).toString();
-      loadAgsToPrisma(agsData);
-
-      unlinkSync(filePath);
-
-      return "hello";
-    },
-    unstable_createMemoryUploadHandler()
-  );
-
-  const formData = await unstable_parseMultipartFormData(
-    request,
-    uploadHandler
-  );
-
-  const newUploadId = uuidv4();
-
-  return redirect(`./${newUploadId}`);
-};
-
 export default function () {
   return (
     <div>
-      <Form method="post" encType="multipart/form-data">
-        <input type="file" name="file" className="file-input" />
-
-        <button type="submit" className="btn btn-primary">
-          Upload
-        </button>
-      </Form>
+      <div>
+        <ul className="steps">
+          <li className="step step-primary">Upload</li>
+          <li className="step">Review</li>
+          <li className="step">Complete</li>
+        </ul>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import {
   makeSchemaCoercePrimitives,
   parseAgsGroup,
   prepareAgsZodSchema,
-} from "./mappingUtils";
+} from "../mappingUtils";
 import { Location } from "@prisma/client";
 import { z } from "zod";
 import { LocationSchema } from "prisma/generated/zod";
