@@ -29,31 +29,40 @@ import {
   unlinkSync,
 } from "fs";
 import { loadAgsToPrisma } from "~/models/ags/prisma";
+import { getAgsUpload } from "~/models/agsUploads";
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }
-
-  //   console.log("request", request);
 
   const role = await requireUserProjectRole(request, params.projectId);
   if (!role) {
     return redirect("/projects");
   }
 
-  return typedjson({ role });
+  if (!params.uploadId) {
+    return redirect(`/projects/${params.projectId}/upload`);
+  }
+
+  const upload = await getAgsUpload(params.uploadId);
+  if (!upload) {
+    return redirect(`/projects/${params.projectId}/upload`);
+  }
+
+  const fileData = await readFileSync(upload.fileUrl, "utf8");
+  const parsed = loadAgsToPrisma(fileData);
+  console.log("parsed", parsed);
+
+  return typedjson({ role, upload, parsed });
 };
 
 export default function () {
+  const data = useTypedLoaderData<typeof loader>();
+
   return (
     <div>
-      <div>
-        <ul className="steps">
-          <li className="step step-primary">Upload</li>
-          <li className="step">Review</li>
-          <li className="step">Complete</li>
-        </ul>
-      </div>
+      <h1>Upload</h1>
+      <div>{JSON.stringify(data.parsed)}</div>
     </div>
   );
 }

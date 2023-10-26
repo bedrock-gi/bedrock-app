@@ -30,6 +30,7 @@ import {
 } from "fs";
 import { loadAgsToPrisma } from "~/models/ags/prisma";
 import { v4 as uuidv4 } from "uuid";
+import { createAgsUpload } from "~/models/agsUploads";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
@@ -47,23 +48,28 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return typedjson({ role });
 };
 
-export const action = async ({ request }: ActionArgs) => {
-  console.log("action");
-  //   console.log("request", request);
-
+export const action = async ({ request, params }: ActionArgs) => {
+  if (!params.projectId) {
+    return redirect("/projects");
+  }
+  const role = await requireUserProjectRole(request, params.projectId);
+  if (!role) {
+    return redirect("/projects");
+  }
   const uploadHandler = unstable_composeUploadHandlers(
     async ({ name, contentType, data, filename }) => {
-      const filePath = "temp.txt";
+      const randomId = uuidv4();
+      const filePath = `./uploads/${randomId}.ags`;
       const writableStream = createWriteStream(filePath);
+      const agsUpload = await createAgsUpload(
+        role.projectId,
+        role.userId,
+        filePath
+      );
 
       await writeAsyncIterableToWritable(data, writableStream);
 
-      const agsData = readFileSync(filePath).toString();
-      loadAgsToPrisma(agsData);
-
-      unlinkSync(filePath);
-
-      return "hello";
+      return agsUpload.id;
     },
     unstable_createMemoryUploadHandler()
   );
@@ -73,7 +79,7 @@ export const action = async ({ request }: ActionArgs) => {
     uploadHandler
   );
 
-  const newUploadId = uuidv4();
+  const newUploadId = formData.get("file");
 
   return redirect(`./${newUploadId}`);
 };

@@ -28,4 +28,5 @@ export function loadAgsToPrisma(inputFile: string) {
   });
   console.log("agsGroups");
   console.log(agsGroups);
+  return agsGroups;
 }
