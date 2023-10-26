@@ -1,35 +1,10 @@
-import {
-  LoaderArgs,
-  unstable_composeUploadHandlers,
-  unstable_createMemoryUploadHandler,
-  unstable_parseMultipartFormData,
-  ActionArgs,
-  writeAsyncIterableToWritable,
-} from "@remix-run/node";
-import {
-  Form,
-  Link,
-  Outlet,
-  RouteMatch,
-  useLoaderData,
-  useParams,
-} from "@remix-run/react";
+import type { LoaderArgs } from "@remix-run/node";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
-import { json } from "stream/consumers";
-import { getProject } from "~/models/projects";
 import { requireUserProjectRole } from "~/utils/auth.server";
-
-import DropZone from "react-dropzone";
-import {
-  WriteStream,
-  createReadStream,
-  createWriteStream,
-  readFile,
-  readFileSync,
-  unlinkSync,
-} from "fs";
+import { readFileSync } from "fs";
 import { loadAgsToPrisma } from "~/models/ags/prisma";
 import { getAgsUpload } from "~/models/agsUploads";
+
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");

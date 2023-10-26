@@ -1,9 +1,5 @@
-import { agsType } from "./agsTypes";
-import {
-  parseAgs,
-  validateAgsColumnLengths,
-  validateGroupColumnLengths,
-} from "./parse";
+import type { agsType } from "./agsTypes";
+import { parseAgs, validateAgsColumnLengths } from "./parse";
 
 export interface HeadingRaw {
   name: string;

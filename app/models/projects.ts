@@ -1,4 +1,4 @@
-import { Project, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { prisma } from "~/db.server";
 
 export async function getProjects(userId: string) {

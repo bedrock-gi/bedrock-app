@@ -1,14 +1,7 @@
-import { LoaderArgs } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  RouteMatch,
-  useLoaderData,
-  useParams,
-} from "@remix-run/react";
-import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
-import { json } from "stream/consumers";
-import { getProject } from "~/models/projects";
+import type { LoaderArgs } from "@remix-run/node";
+import type { RouteMatch } from "@remix-run/react";
+import { Link, Outlet } from "@remix-run/react";
+import { redirect, typedjson } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {

@@ -1,15 +1,12 @@
-import { Location } from "@prisma/client";
-import { LoaderArgs } from "@remix-run/node";
-import { RouteMatch, Link } from "@remix-run/react";
-import { Marker } from "react-map-gl";
+import type { Location } from "@prisma/client";
+import type { LoaderArgs } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { LocationsMap } from "~/components/Map/LocationsMap";
-import { MapView } from "~/components/Map/Map";
 import { Table } from "~/components/Table/Table";
-import { TableConfig } from "~/components/Table/TableConfig";
+import type { TableConfig } from "~/components/Table/TableConfig";
 import { getLocations, seedLocations } from "~/models/locations";
-import { getProject } from "~/models/projects";
-import { requireUser, requireUserProjectRole } from "~/utils/auth.server";
+import { requireUserProjectRole } from "~/utils/auth.server";
 
 const locationTableConfig: TableConfig<Location> = {
   id: "loca",

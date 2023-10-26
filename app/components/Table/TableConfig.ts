@@ -1,6 +1,8 @@
-import { createColumnHelper, AccessorFn } from "@tanstack/react-table";
-import { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
-import { DataColumns } from "~/models/ags/mappingUtils";
+import { createColumnHelper } from "@tanstack/react-table";
+import type {
+  ObjectWithStringKeys,
+  DataColumns,
+} from "~/models/ags/mappingUtils";
 
 export interface Column<T extends ObjectWithStringKeys> {
   label?: string;
@@ -18,7 +20,6 @@ export function createColumns<T extends ObjectWithStringKeys>(
   config: TableConfig<T>
 ) {
   const columnHelper = createColumnHelper<T>();
-  config.columns;
 
   return config.columns.map((column) =>
     columnHelper.accessor((row: DataColumns<T>) => row[column.accessor], {

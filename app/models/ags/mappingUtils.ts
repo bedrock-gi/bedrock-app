@@ -1,16 +1,6 @@
-import {
-  ZodNullable,
-  ZodNumber,
-  ZodObject,
-  ZodType,
-  ZodTypeAny,
-  ZodTypeDef,
-  string,
-  z,
-} from "zod";
-import { GroupRaw } from "~/models/ags/models";
-import { Prisma } from "@prisma/client";
-import { prisma } from "~/db.server";
+import type { ZodObject, ZodTypeAny } from "zod";
+import { ZodNullable, ZodNumber, z } from "zod";
+import type { GroupRaw } from "~/models/ags/models";
 
 export type ObjectWithStringKeys = {
   [key: string]: any;

@@ -1,5 +1,5 @@
 import { prisma } from "~/db.server";
-import { AgsUpload, AgsUploadStatus } from "@prisma/client";
+import { AgsUploadStatus } from "@prisma/client";
 
 export async function createAgsUpload(
   projectId: string,

@@ -1,25 +1,17 @@
-import {
-  LoaderFunction,
-  json,
-  LinksFunction,
-  LoaderArgs,
-} from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import { prisma } from "../db.server";
-import { Project, User } from "@prisma/client";
-import { authenticator, requireUser } from "~/utils/auth.server";
+import type { LoaderArgs } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import type { Project } from "@prisma/client";
+import { requireUser } from "~/utils/auth.server";
 
-import { getProjects, getProjectsWithLocations } from "~/models/projects";
+import { getProjectsWithLocations } from "~/models/projects";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { Map } from "react-map-gl";
-import { MapView } from "~/components/Map/Map";
 import ProjectsMap from "~/components/Map/ProjectsMap";
 
 const ProjectCard = ({ project }: { project: Project }) => {
   return (
     <div className="card w-4/5 bg-base-100 shadow-xl">
       <figure>
-        <img src="https://picsum.photos/id/1005/400/250" />
+        <img src="https://picsum.photos/id/1005/400/250" alt="project" />
       </figure>
       <div className="card-body">
         <h2 className="card-title">{project.name}</h2>

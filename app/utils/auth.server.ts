@@ -2,9 +2,8 @@
 import { Authenticator } from "remix-auth";
 import { Auth0Strategy } from "remix-auth-auth0";
 import { getOrCreateUser } from "~/models/users";
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import { sessionStorage } from "~/services/session.server";
-import { LoaderArgs } from "@remix-run/node";
 import { getProjectRole } from "~/models/projects";
 
 export const requireUser = (request: Request) => {

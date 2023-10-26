@@ -1,15 +1,12 @@
-import { useState } from "react";
-import { Location } from "@prisma/client";
-
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
-import { TableConfig, createColumns } from "./TableConfig";
-import { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
+import type { TableConfig } from "./TableConfig";
+import { createColumns } from "./TableConfig";
+import type { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
 
 interface Props<T extends ObjectWithStringKeys> {
   data: T[];
