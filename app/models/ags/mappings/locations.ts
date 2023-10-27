@@ -10,6 +10,7 @@ export const locationMapping: AgsMapping<Omit<Location, "projectId">> = {
   prismaLabel: "location",
   checkIfRecordExists: async (record) => {
     const { name } = record;
+    console.log("checking if record exists", name);
     const existingRecord = await prisma.location.findMany({
       where: {
         name,

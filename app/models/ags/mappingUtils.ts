@@ -17,7 +17,9 @@ export type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
 
-  checkIfRecordExists: (record?: DataColumns<T>) => Promise<boolean>;
+  checkIfRecordExists: (
+    record: DataColumns<ObjectWithStringKeys>
+  ) => Promise<boolean>;
 
   zodSchema: ZodPrismaType<T>;
   columns: {

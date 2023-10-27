@@ -18,7 +18,7 @@ type AgsUploadSummary = PrismaRecordCollection & {
   updatedRecords: number;
 };
 
-export function createAgsImportSummary(inputFile: string) {
+export async function createAgsImportSummary(inputFile: string) {
   const ags = new Ags(inputFile);
 
   console.log(ags.agsData);
@@ -38,11 +38,9 @@ export function createAgsImportSummary(inputFile: string) {
   const agsUploadSummary: AgsUploadSummary[] = agsGroups.map((group) => {
     const { records, mapping } = group;
 
-    const numNewRecords = records.filter(
-      (record: typeof mapping.__typeExample) => {
-        return !mapping.checkIfRecordExists(record);
-      }
-    ).length;
+    const numNewRecords = records.filter(async (record) => {
+      return await !mapping.checkIfRecordExists(record);
+    }).length;
     const numUpdatedRecords = records.length - numNewRecords;
 
     return {
