@@ -1,16 +1,6 @@
-import {
-  ZodNullable,
-  ZodNumber,
-  ZodObject,
-  ZodType,
-  ZodTypeAny,
-  ZodTypeDef,
-  string,
-  z,
-} from "zod";
-import { GroupRaw } from "~/models/ags/models";
-import { Prisma } from "@prisma/client";
-import { prisma } from "~/db.server";
+import type { ZodObject, ZodTypeAny } from "zod";
+import { ZodNullable, ZodNumber, z } from "zod";
+import type { GroupRaw } from "~/models/ags/models";
 
 export type ObjectWithStringKeys = {
   [key: string]: any;
@@ -26,10 +16,14 @@ type ZodPrismaType<T extends ObjectWithStringKeys> = z.ZodType<DataColumns<T>>;
 export type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
+
+  checkIfRecordExists: (record?: DataColumns<T>) => Promise<boolean>;
+
   zodSchema: ZodPrismaType<T>;
   columns: {
     [agsColumnName: string]: keyof DataColumns<T>;
   };
+  __typeExample?: DataColumns<T>;
 };
 
 export function parseAgsGroup<T extends ObjectWithStringKeys>(

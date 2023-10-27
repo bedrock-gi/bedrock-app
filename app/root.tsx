@@ -1,20 +1,10 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction, LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import {
-  Link,
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useMatches,
-} from "@remix-run/react";
+import type { LinksFunction } from "@remix-run/node";
+
+import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
-import { requireUser } from "./utils/auth.server";
-import { Breadcrumb } from "./components/Breadcrumb";
+
 import { Sidebar } from "./components/Sidebar";
 
 export interface BreadcrumbData {

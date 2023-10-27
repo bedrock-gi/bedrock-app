@@ -1,5 +1,5 @@
 import { agsType } from "./agsTypes";
-import { Ags, AgsRaw, GroupRaw } from "./models";
+import { AgsRaw, GroupRaw } from "./models";
 
 const newLineRegex = /\r?\n/;
 

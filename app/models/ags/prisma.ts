@@ -1,6 +1,6 @@
 import { Ags } from "./models";
 import { mappings } from "./mappings";
-import { prisma } from "~/db.server";
+import { Prisma, PrismaClient } from "@prisma/client";
 import {
   AgsMapping,
   DataColumns,
@@ -8,25 +8,49 @@ import {
   parseAgsGroup,
 } from "./mappingUtils";
 
-type PrismaRecordCollection<T extends ObjectWithStringKeys> = {
-  records: DataColumns<T>[];
-  mapping: AgsMapping<T>;
+type PrismaRecordCollection = {
+  records: DataColumns<ObjectWithStringKeys>[];
+  mapping: AgsMapping<ObjectWithStringKeys>;
 };
 
-interface PrismaRecordCollectionGroup {
-  [key: string]: PrismaRecordCollection<any>;
-}
+type AgsUploadSummary = PrismaRecordCollection & {
+  newRecords: number;
+  updatedRecords: number;
+};
 
-export function loadAgsToPrisma(inputFile: string) {
+export function createAgsImportSummary(inputFile: string) {
   const ags = new Ags(inputFile);
 
   console.log(ags.agsData);
 
-  const agsGroups = mappings.map((mapping) => {
-    return parseAgsGroup(ags.agsData[mapping.agsTableName], mapping)
-      .parsedRecords;
+  const agsGroups: PrismaRecordCollection[] = Object.entries(mappings).map(
+    ([key, mapping]) => {
+      const agsGroup = ags.agsData[mapping.agsTableName];
+      const records = parseAgsGroup(agsGroup, mapping);
+
+      return {
+        records: records.parsedRecords,
+        mapping,
+      };
+    }
+  );
+
+  const agsUploadSummary: AgsUploadSummary[] = agsGroups.map((group) => {
+    const { records, mapping } = group;
+
+    const numNewRecords = records.filter(
+      (record: typeof mapping.__typeExample) => {
+        return !mapping.checkIfRecordExists(record);
+      }
+    ).length;
+    const numUpdatedRecords = records.length - numNewRecords;
+
+    return {
+      ...group,
+      newRecords: numNewRecords,
+      updatedRecords: numUpdatedRecords,
+    };
   });
-  console.log("agsGroups");
-  console.log(agsGroups);
-  return agsGroups;
+
+  return agsUploadSummary;
 }

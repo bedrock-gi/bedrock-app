@@ -19,16 +19,8 @@ import { json } from "stream/consumers";
 import { getProject } from "~/models/projects";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
-import DropZone from "react-dropzone";
-import {
-  WriteStream,
-  createReadStream,
-  createWriteStream,
-  readFile,
-  readFileSync,
-  unlinkSync,
-} from "fs";
-import { loadAgsToPrisma } from "~/models/ags/prisma";
+import { readFileSync } from "fs";
+import { createAgsImportSummary } from "~/models/ags/prisma";
 import { getAgsUpload } from "~/models/agsUploads";
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
@@ -50,7 +42,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   }
 
   const fileData = await readFileSync(upload.fileUrl, "utf8");
-  const parsed = loadAgsToPrisma(fileData);
+  const parsed = createAgsImportSummary(fileData);
   console.log("parsed", parsed);
 
   return typedjson({ role, upload, parsed });
