@@ -1,19 +1,11 @@
-import {
-  LoaderFunction,
-  json,
-  LinksFunction,
-  LoaderArgs,
-} from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import { prisma } from "../db.server";
-import { Project, User } from "@prisma/client";
-import { authenticator, requireUser } from "~/utils/auth.server";
+import { LoaderArgs } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import { Project } from "@prisma/client";
+import { requireUser } from "~/utils/auth.server";
 
-import { getProjects, getProjectsWithLocations } from "~/models/projects";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { Map } from "react-map-gl";
-import { MapView } from "~/components/Map/Map";
 import ProjectsMap from "~/components/Map/ProjectsMap";
+import { getProjectsWithLocations } from "~/models/prisma/projects";
 
 const ProjectCard = ({ project }: { project: Project }) => {
   return (

@@ -1,6 +1,6 @@
 import { prisma } from "~/db.server";
-import type { AgsMapping } from "../mappingUtils";
-import { prepareAgsZodSchema } from "../mappingUtils";
+import type AgsMapping from "../../../types/agsMapping";
+import { prepareAgsZodSchema } from "../zod";
 import type { Location } from "@prisma/client";
 
 import { LocationSchema } from "prisma/generated/zod";
@@ -8,9 +8,9 @@ import { LocationSchema } from "prisma/generated/zod";
 export const locationMapping: AgsMapping<Omit<Location, "projectId">> = {
   agsTableName: "LOCA",
   prismaLabel: "location",
-  checkIfRecordExists: async (record) => {
+  checkIfRecordExists: async (record, projectId) => {
     const { name } = record;
-    console.log("checking if record exists", name);
+
     const existingRecord = await prisma.location.findMany({
       where: {
         name,

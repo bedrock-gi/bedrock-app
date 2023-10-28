@@ -1,6 +1,6 @@
 import { createColumnHelper, AccessorFn } from "@tanstack/react-table";
-import { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
-import { DataColumns } from "~/models/ags/mappingUtils";
+import { ObjectWithStringKeys } from "~/types/agsMapping";
+import { DataColumns } from "~/types/agsMapping";
 
 export interface Column<T extends ObjectWithStringKeys> {
   label?: string;

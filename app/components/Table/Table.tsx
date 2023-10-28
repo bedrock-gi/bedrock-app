@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 
 import { TableConfig, createColumns } from "./TableConfig";
-import { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
+import { ObjectWithStringKeys } from "~/types/agsMapping";
 
 interface Props<T extends ObjectWithStringKeys> {
   data: T[];

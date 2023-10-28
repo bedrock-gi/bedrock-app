@@ -1,12 +1,9 @@
 import { Ags } from "./models";
 import { mappings } from "./mappings";
-import { Prisma, PrismaClient } from "@prisma/client";
-import {
-  AgsMapping,
-  DataColumns,
-  ObjectWithStringKeys,
-  parseAgsGroup,
-} from "./mappingUtils";
+
+import type AgsMapping from "../../types/agsMapping";
+import type { DataColumns, ObjectWithStringKeys } from "../../types/agsMapping";
+import { parseAgsGroup } from "./parse";
 
 type PrismaRecordCollection = {
   records: DataColumns<ObjectWithStringKeys>[];
@@ -18,11 +15,13 @@ type AgsUploadSummary = PrismaRecordCollection & {
   updatedRecords: number;
 };
 
-export async function createAgsImportSummary(inputFile: string) {
+export async function createAgsImportSummary(
+  inputFile: string,
+  projectId: string
+) {
   const ags = new Ags(inputFile);
 
-  console.log(ags.agsData);
-
+  // @ts-ignore
   const agsGroups: PrismaRecordCollection[] = Object.entries(mappings).map(
     ([key, mapping]) => {
       const agsGroup = ags.agsData[mapping.agsTableName];
@@ -39,7 +38,7 @@ export async function createAgsImportSummary(inputFile: string) {
     const { records, mapping } = group;
 
     const numNewRecords = records.filter(async (record) => {
-      return await !mapping.checkIfRecordExists(record);
+      return await !mapping.checkIfRecordExists(record, projectId);
     }).length;
     const numUpdatedRecords = records.length - numNewRecords;
 

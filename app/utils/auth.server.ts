@@ -1,11 +1,11 @@
 // app/utils/auth.server.ts
 import { Authenticator } from "remix-auth";
 import { Auth0Strategy } from "remix-auth-auth0";
-import { getOrCreateUser } from "~/models/users";
-import { User } from "@prisma/client";
+
+import type { User } from "@prisma/client";
 import { sessionStorage } from "~/services/session.server";
-import { LoaderArgs } from "@remix-run/node";
-import { getProjectRole } from "~/models/projects";
+import { getProjectRole } from "~/models/prisma/projects";
+import { getOrCreateUser } from "~/models/prisma/users";
 
 export const requireUser = (request: Request) => {
   return authenticator.isAuthenticated(request, {

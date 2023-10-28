@@ -1,5 +1,8 @@
-import { agsType } from "./agsTypes";
-import { AgsRaw, GroupRaw } from "./models";
+import type { GroupRaw, agsType, AgsRaw } from "~/types/ags";
+import type { ObjectWithStringKeys } from "../../types/agsMapping";
+import type AgsMapping from "../../types/agsMapping";
+
+import { parseRecordsToZod } from "./zod";
 
 const newLineRegex = /\r?\n/;
 
@@ -70,20 +73,56 @@ export const parseAgs = (input: string) => {
   return ags;
 };
 
-export const validateGroupColumnLengths = (agsData: GroupRaw) => {
-  const numRecords = Object.values(agsData.columns)[0].data.length;
-  const agsDataColumns = Object.keys(agsData.columns);
-  agsDataColumns.forEach((column) => {
-    if (agsData.columns[column].data.length !== numRecords) {
-      throw new Error(
-        `Column ${column} has length ${agsData.columns[column].data.length} but expected ${numRecords}`
-      );
-    }
-  });
-};
+// export const validateGroupColumnLengths = (agsData: GroupRaw) => {
+//   const numRecords = Object.values(agsData.columns)[0].data.length;
+//   const agsDataColumns = Object.keys(agsData.columns);
+//   agsDataColumns.forEach((column) => {
+//     if (agsData.columns[column].data.length !== numRecords) {
+//       throw new Error(
+//         `Column ${column} has length ${agsData.columns[column].data.length} but expected ${numRecords}`
+//       );
+//     }
+//   });
+// };
 
-export const validateAgsColumnLengths = (agsData: AgsRaw) => {
-  Object.values(agsData).forEach((group) => {
-    validateGroupColumnLengths(group);
-  });
-};
+// export const validateAgsColumnLengths = (agsData: AgsRaw) => {
+//   Object.values(agsData).forEach((group) => {
+//     validateGroupColumnLengths(group);
+//   });
+// };
+
+export function parseAgsGroup<T extends ObjectWithStringKeys>(
+  agsData: GroupRaw,
+  agsMapping: AgsMapping<T>
+) {
+  if (agsData.name !== agsMapping.agsTableName) {
+    throw new Error(
+      `Ags group name ${agsData.name} does not match expected name ${agsMapping.agsTableName}`
+    );
+  }
+
+  const agsDataColumns = Object.keys(agsData.columns);
+
+  //   find subset of agsDataColumns we expect
+  const expectedAgsColumns = Object.keys(agsMapping.columns);
+
+  const intersection = agsDataColumns.filter((x) =>
+    expectedAgsColumns.includes(x)
+  );
+
+  //   for now, assume cols are same length
+  const numRecords = agsData.columns[agsDataColumns[0]].data.length;
+
+  const records: ObjectWithStringKeys[] = [];
+  for (let i = 0; i < numRecords; i++) {
+    const record = Object.fromEntries(
+      intersection.map((column) => [
+        agsMapping.columns[column],
+        agsData.columns[column].data[i],
+      ])
+    );
+    records.push(record);
+  }
+
+  return parseRecordsToZod(records, agsMapping.zodSchema);
+}

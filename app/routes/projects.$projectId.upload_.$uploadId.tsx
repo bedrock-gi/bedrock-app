@@ -1,27 +1,10 @@
-import {
-  LoaderArgs,
-  unstable_composeUploadHandlers,
-  unstable_createMemoryUploadHandler,
-  unstable_parseMultipartFormData,
-  ActionArgs,
-  writeAsyncIterableToWritable,
-} from "@remix-run/node";
-import {
-  Form,
-  Link,
-  Outlet,
-  RouteMatch,
-  useLoaderData,
-  useParams,
-} from "@remix-run/react";
+import type { LoaderArgs } from "@remix-run/node";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
-import { json } from "stream/consumers";
-import { getProject } from "~/models/projects";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
 import { readFileSync } from "fs";
-import { createAgsImportSummary } from "~/models/ags/prisma";
-import { getAgsUpload } from "~/models/agsUploads";
+import { createAgsImportSummary } from "~/models/ags/createSummary";
+import { getAgsUpload } from "~/models/prisma/agsUploads";
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
@@ -42,7 +25,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   }
 
   const fileData = await readFileSync(upload.fileUrl, "utf8");
-  const parsed = createAgsImportSummary(fileData);
+  const parsed = await createAgsImportSummary(fileData, role.projectId);
   console.log("parsed", parsed);
 
   return typedjson({ role, upload, parsed });
@@ -53,8 +36,28 @@ export default function () {
 
   return (
     <div>
-      <h1>Upload</h1>
-      <div>{JSON.stringify(data.parsed)}</div>
+      <h1>Upload Summary</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Table </th>
+            <th>Ags Table </th>
+            <th>Number of New Records</th>
+            <th>Number of Updated Records</th>
+          </tr>
+        </thead>
+
+        {data.parsed.map((table) => (
+          <tbody key={table.mapping.agsTableName}>
+            <tr>
+              <td>{table.mapping.prismaLabel}</td>
+              <td>{table.mapping.agsTableName}</td>
+              <td>{table.newRecords}</td>
+              <td>{table.updatedRecords}</td>
+            </tr>
+          </tbody>
+        ))}
+      </table>
     </div>
   );
 }

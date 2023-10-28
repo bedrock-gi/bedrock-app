@@ -1,4 +1,4 @@
-import type { AgsMapping } from "../mappingUtils";
+import type AgsMapping from "../../../types/agsMapping";
 import { locationMapping } from "./locations";
 
 export type TableMapping = {

@@ -1,14 +1,10 @@
-import {
-  ActionFunction,
-  LoaderFunction,
-  json,
-  redirect,
-} from "@remix-run/node";
+import type { ActionFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { prisma } from "../db.server";
-import { createProject } from "~/models/projects";
+
 import { requireUser } from "~/utils/auth.server";
 import LabeledInput from "~/components/LabeledInput";
+import { createProject } from "~/models/prisma/projects";
 
 export const action = (async ({ request }) => {
   const user = await requireUser(request);
