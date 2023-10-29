@@ -3,8 +3,9 @@ import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
 import { readFileSync } from "fs";
-import { createAgsImportSummary } from "~/models/ags/createSummary";
+import { createAgsImportSummary } from "~/models/ags/importSummary";
 import { getAgsUpload } from "~/models/prisma/agsUploads";
+import { Form } from "@remix-run/react";
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
@@ -20,13 +21,16 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   }
 
   const upload = await getAgsUpload(params.uploadId);
-  if (!upload) {
+  if (!upload || !upload.fileUrl) {
     return redirect(`/projects/${params.projectId}/upload`);
   }
 
   const fileData = await readFileSync(upload.fileUrl, "utf8");
-  const parsed = await createAgsImportSummary(fileData, role.projectId);
-  console.log("parsed", parsed);
+  const parsed = await createAgsImportSummary(
+    fileData,
+    role.projectId,
+    upload.id
+  );
 
   return typedjson({ role, upload, parsed });
 };
@@ -52,12 +56,18 @@ export default function () {
             <tr>
               <td>{table.mapping.prismaLabel}</td>
               <td>{table.mapping.agsTableName}</td>
-              <td>{table.newRecords}</td>
-              <td>{table.updatedRecords}</td>
+              <td>{table.numNewRecords}</td>
+              <td>{table.numUpdatedRecords}</td>
             </tr>
           </tbody>
         ))}
       </table>
+
+      <Form method="post">
+        <button type="submit" className="btn btn-primary">
+          Confirm Import
+        </button>
+      </Form>
     </div>
   );
 }

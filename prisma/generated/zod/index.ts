@@ -62,7 +62,7 @@ export const SampleScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt']
 
 export const ColumnDefinitionScalarFieldEnumSchema = z.enum(['id','columnId','tableId','projectId','label','dataType']);
 
-export const AgsUploadScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','projectId','fileUrl','status']);
+export const AgsUploadScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','userId','projectId','fileUrl','parsedRecordsUrl','status','newRecordsCount','updatedRecordsCount']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -187,7 +187,10 @@ export const AgsUploadSchema = z.object({
   updatedAt: z.coerce.date(),
   userId: z.string(),
   projectId: z.string(),
-  fileUrl: z.string(),
+  fileUrl: z.string().nullable(),
+  parsedRecordsUrl: z.string().nullable(),
+  newRecordsCount: z.number().int().nullable(),
+  updatedRecordsCount: z.number().int().nullable(),
 })
 
 export type AgsUpload = z.infer<typeof AgsUploadSchema>
@@ -233,7 +236,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
 export const UserProjectIncludeSchema: z.ZodType<Prisma.UserProjectInclude> = z.object({
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   project: z.union([z.boolean(),z.lazy(() => ProjectArgsSchema)]).optional(),
-  AgsUpload: z.union([z.boolean(),z.lazy(() => AgsUploadFindManyArgsSchema)]).optional(),
+  agsUploads: z.union([z.boolean(),z.lazy(() => AgsUploadFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserProjectCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -247,7 +250,7 @@ export const UserProjectCountOutputTypeArgsSchema: z.ZodType<Prisma.UserProjectC
 }).strict();
 
 export const UserProjectCountOutputTypeSelectSchema: z.ZodType<Prisma.UserProjectCountOutputTypeSelect> = z.object({
-  AgsUpload: z.boolean().optional(),
+  agsUploads: z.boolean().optional(),
 }).strict();
 
 export const UserProjectSelectSchema: z.ZodType<Prisma.UserProjectSelect> = z.object({
@@ -258,7 +261,7 @@ export const UserProjectSelectSchema: z.ZodType<Prisma.UserProjectSelect> = z.ob
   projectId: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   project: z.union([z.boolean(),z.lazy(() => ProjectArgsSchema)]).optional(),
-  AgsUpload: z.union([z.boolean(),z.lazy(() => AgsUploadFindManyArgsSchema)]).optional(),
+  agsUploads: z.union([z.boolean(),z.lazy(() => AgsUploadFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserProjectCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -373,7 +376,10 @@ export const AgsUploadSelectSchema: z.ZodType<Prisma.AgsUploadSelect> = z.object
   userId: z.boolean().optional(),
   projectId: z.boolean().optional(),
   fileUrl: z.boolean().optional(),
+  parsedRecordsUrl: z.boolean().optional(),
   status: z.boolean().optional(),
+  newRecordsCount: z.boolean().optional(),
+  updatedRecordsCount: z.boolean().optional(),
   userProject: z.union([z.boolean(),z.lazy(() => UserProjectArgsSchema)]).optional(),
 }).strict()
 
@@ -441,7 +447,7 @@ export const UserProjectWhereInputSchema: z.ZodType<Prisma.UserProjectWhereInput
   projectId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   project: z.union([ z.lazy(() => ProjectRelationFilterSchema),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
-  AgsUpload: z.lazy(() => AgsUploadListRelationFilterSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadListRelationFilterSchema).optional()
 }).strict();
 
 export const UserProjectOrderByWithRelationInputSchema: z.ZodType<Prisma.UserProjectOrderByWithRelationInput> = z.object({
@@ -452,7 +458,7 @@ export const UserProjectOrderByWithRelationInputSchema: z.ZodType<Prisma.UserPro
   projectId: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
-  AgsUpload: z.lazy(() => AgsUploadOrderByRelationAggregateInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const UserProjectWhereUniqueInputSchema: z.ZodType<Prisma.UserProjectWhereUniqueInput> = z.object({
@@ -690,8 +696,11 @@ export const AgsUploadWhereInputSchema: z.ZodType<Prisma.AgsUploadWhereInput> = 
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   projectId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  fileUrl: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  fileUrl: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   status: z.union([ z.lazy(() => EnumAgsUploadStatusFilterSchema),z.lazy(() => AgsUploadStatusSchema) ]).optional(),
+  newRecordsCount: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   userProject: z.union([ z.lazy(() => UserProjectRelationFilterSchema),z.lazy(() => UserProjectWhereInputSchema) ]).optional(),
 }).strict();
 
@@ -701,8 +710,11 @@ export const AgsUploadOrderByWithRelationInputSchema: z.ZodType<Prisma.AgsUpload
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
-  fileUrl: z.lazy(() => SortOrderSchema).optional(),
+  fileUrl: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  parsedRecordsUrl: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
+  newRecordsCount: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  updatedRecordsCount: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   userProject: z.lazy(() => UserProjectOrderByWithRelationInputSchema).optional()
 }).strict();
 
@@ -716,11 +728,16 @@ export const AgsUploadOrderByWithAggregationInputSchema: z.ZodType<Prisma.AgsUpl
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
-  fileUrl: z.lazy(() => SortOrderSchema).optional(),
+  fileUrl: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  parsedRecordsUrl: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
+  newRecordsCount: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  updatedRecordsCount: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => AgsUploadCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => AgsUploadAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => AgsUploadMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => AgsUploadMinOrderByAggregateInputSchema).optional()
+  _min: z.lazy(() => AgsUploadMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => AgsUploadSumOrderByAggregateInputSchema).optional()
 }).strict();
 
 export const AgsUploadScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.AgsUploadScalarWhereWithAggregatesInput> = z.object({
@@ -732,8 +749,11 @@ export const AgsUploadScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Ags
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   projectId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  fileUrl: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  fileUrl: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   status: z.union([ z.lazy(() => EnumAgsUploadStatusWithAggregatesFilterSchema),z.lazy(() => AgsUploadStatusSchema) ]).optional(),
+  newRecordsCount: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
 }).strict();
 
 export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object({
@@ -802,7 +822,7 @@ export const UserProjectCreateInputSchema: z.ZodType<Prisma.UserProjectCreateInp
   updatedAt: z.coerce.date().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutUserProjectsInputSchema),
   project: z.lazy(() => ProjectCreateNestedOneWithoutUserProjectsInputSchema),
-  AgsUpload: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedCreateInputSchema: z.ZodType<Prisma.UserProjectUncheckedCreateInput> = z.object({
@@ -811,7 +831,7 @@ export const UserProjectUncheckedCreateInputSchema: z.ZodType<Prisma.UserProject
   updatedAt: z.coerce.date().optional(),
   userId: z.string(),
   projectId: z.string(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectUpdateInputSchema: z.ZodType<Prisma.UserProjectUpdateInput> = z.object({
@@ -820,7 +840,7 @@ export const UserProjectUpdateInputSchema: z.ZodType<Prisma.UserProjectUpdateInp
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutUserProjectsNestedInputSchema).optional(),
   project: z.lazy(() => ProjectUpdateOneRequiredWithoutUserProjectsNestedInputSchema).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedUpdateInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateInput> = z.object({
@@ -829,7 +849,7 @@ export const UserProjectUncheckedUpdateInputSchema: z.ZodType<Prisma.UserProject
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   projectId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const UserProjectCreateManyInputSchema: z.ZodType<Prisma.UserProjectCreateManyInput> = z.object({
@@ -1106,9 +1126,12 @@ export const AgsUploadCreateInputSchema: z.ZodType<Prisma.AgsUploadCreateInput> 
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  fileUrl: z.string(),
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
   status: z.lazy(() => AgsUploadStatusSchema),
-  userProject: z.lazy(() => UserProjectCreateNestedOneWithoutAgsUploadInputSchema)
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable(),
+  userProject: z.lazy(() => UserProjectCreateNestedOneWithoutAgsUploadsInputSchema)
 }).strict();
 
 export const AgsUploadUncheckedCreateInputSchema: z.ZodType<Prisma.AgsUploadUncheckedCreateInput> = z.object({
@@ -1117,17 +1140,23 @@ export const AgsUploadUncheckedCreateInputSchema: z.ZodType<Prisma.AgsUploadUnch
   updatedAt: z.coerce.date().optional(),
   userId: z.string(),
   projectId: z.string(),
-  fileUrl: z.string(),
-  status: z.lazy(() => AgsUploadStatusSchema)
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
+  status: z.lazy(() => AgsUploadStatusSchema),
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable()
 }).strict();
 
 export const AgsUploadUpdateInputSchema: z.ZodType<Prisma.AgsUploadUpdateInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  userProject: z.lazy(() => UserProjectUpdateOneRequiredWithoutAgsUploadNestedInputSchema).optional()
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userProject: z.lazy(() => UserProjectUpdateOneRequiredWithoutAgsUploadsNestedInputSchema).optional()
 }).strict();
 
 export const AgsUploadUncheckedUpdateInputSchema: z.ZodType<Prisma.AgsUploadUncheckedUpdateInput> = z.object({
@@ -1136,8 +1165,11 @@ export const AgsUploadUncheckedUpdateInputSchema: z.ZodType<Prisma.AgsUploadUnch
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   projectId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AgsUploadCreateManyInputSchema: z.ZodType<Prisma.AgsUploadCreateManyInput> = z.object({
@@ -1146,16 +1178,22 @@ export const AgsUploadCreateManyInputSchema: z.ZodType<Prisma.AgsUploadCreateMan
   updatedAt: z.coerce.date().optional(),
   userId: z.string(),
   projectId: z.string(),
-  fileUrl: z.string(),
-  status: z.lazy(() => AgsUploadStatusSchema)
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
+  status: z.lazy(() => AgsUploadStatusSchema),
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable()
 }).strict();
 
 export const AgsUploadUpdateManyMutationInputSchema: z.ZodType<Prisma.AgsUploadUpdateManyMutationInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AgsUploadUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AgsUploadUncheckedUpdateManyInput> = z.object({
@@ -1164,8 +1202,11 @@ export const AgsUploadUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AgsUpload
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   projectId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
@@ -1580,6 +1621,17 @@ export const EnumAgsUploadStatusFilterSchema: z.ZodType<Prisma.EnumAgsUploadStat
   not: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => NestedEnumAgsUploadStatusFilterSchema) ]).optional(),
 }).strict();
 
+export const IntNullableFilterSchema: z.ZodType<Prisma.IntNullableFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
 export const UserProjectRelationFilterSchema: z.ZodType<Prisma.UserProjectRelationFilter> = z.object({
   is: z.lazy(() => UserProjectWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => UserProjectWhereInputSchema).optional().nullable()
@@ -1592,7 +1644,15 @@ export const AgsUploadCountOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUplo
   userId: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   fileUrl: z.lazy(() => SortOrderSchema).optional(),
-  status: z.lazy(() => SortOrderSchema).optional()
+  parsedRecordsUrl: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  newRecordsCount: z.lazy(() => SortOrderSchema).optional(),
+  updatedRecordsCount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const AgsUploadAvgOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUploadAvgOrderByAggregateInput> = z.object({
+  newRecordsCount: z.lazy(() => SortOrderSchema).optional(),
+  updatedRecordsCount: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AgsUploadMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUploadMaxOrderByAggregateInput> = z.object({
@@ -1602,7 +1662,10 @@ export const AgsUploadMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUpload
   userId: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   fileUrl: z.lazy(() => SortOrderSchema).optional(),
-  status: z.lazy(() => SortOrderSchema).optional()
+  parsedRecordsUrl: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  newRecordsCount: z.lazy(() => SortOrderSchema).optional(),
+  updatedRecordsCount: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AgsUploadMinOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUploadMinOrderByAggregateInput> = z.object({
@@ -1612,7 +1675,15 @@ export const AgsUploadMinOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUpload
   userId: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
   fileUrl: z.lazy(() => SortOrderSchema).optional(),
-  status: z.lazy(() => SortOrderSchema).optional()
+  parsedRecordsUrl: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  newRecordsCount: z.lazy(() => SortOrderSchema).optional(),
+  updatedRecordsCount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const AgsUploadSumOrderByAggregateInputSchema: z.ZodType<Prisma.AgsUploadSumOrderByAggregateInput> = z.object({
+  newRecordsCount: z.lazy(() => SortOrderSchema).optional(),
+  updatedRecordsCount: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const EnumAgsUploadStatusWithAggregatesFilterSchema: z.ZodType<Prisma.EnumAgsUploadStatusWithAggregatesFilter> = z.object({
@@ -1623,6 +1694,22 @@ export const EnumAgsUploadStatusWithAggregatesFilterSchema: z.ZodType<Prisma.Enu
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional()
+}).strict();
+
+export const IntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.IntNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
 }).strict();
 
 export const UserProjectCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.UserProjectCreateNestedManyWithoutUserInput> = z.object({
@@ -1919,9 +2006,9 @@ export const ProjectUpdateOneRequiredWithoutColumnDefinitionsNestedInputSchema: 
   update: z.union([ z.lazy(() => ProjectUpdateWithoutColumnDefinitionsInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutColumnDefinitionsInputSchema) ]).optional(),
 }).strict();
 
-export const UserProjectCreateNestedOneWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectCreateNestedOneWithoutAgsUploadInput> = z.object({
-  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserProjectCreateOrConnectWithoutAgsUploadInputSchema).optional(),
+export const UserProjectCreateNestedOneWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectCreateNestedOneWithoutAgsUploadsInput> = z.object({
+  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserProjectCreateOrConnectWithoutAgsUploadsInputSchema).optional(),
   connect: z.lazy(() => UserProjectWhereUniqueInputSchema).optional()
 }).strict();
 
@@ -1929,12 +2016,20 @@ export const EnumAgsUploadStatusFieldUpdateOperationsInputSchema: z.ZodType<Pris
   set: z.lazy(() => AgsUploadStatusSchema).optional()
 }).strict();
 
-export const UserProjectUpdateOneRequiredWithoutAgsUploadNestedInputSchema: z.ZodType<Prisma.UserProjectUpdateOneRequiredWithoutAgsUploadNestedInput> = z.object({
-  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => UserProjectCreateOrConnectWithoutAgsUploadInputSchema).optional(),
-  upsert: z.lazy(() => UserProjectUpsertWithoutAgsUploadInputSchema).optional(),
+export const NullableIntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableIntFieldUpdateOperationsInput> = z.object({
+  set: z.number().optional().nullable(),
+  increment: z.number().optional(),
+  decrement: z.number().optional(),
+  multiply: z.number().optional(),
+  divide: z.number().optional()
+}).strict();
+
+export const UserProjectUpdateOneRequiredWithoutAgsUploadsNestedInputSchema: z.ZodType<Prisma.UserProjectUpdateOneRequiredWithoutAgsUploadsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserProjectCreateOrConnectWithoutAgsUploadsInputSchema).optional(),
+  upsert: z.lazy(() => UserProjectUpsertWithoutAgsUploadsInputSchema).optional(),
   connect: z.lazy(() => UserProjectWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => UserProjectUpdateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedUpdateWithoutAgsUploadInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => UserProjectUpdateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedUpdateWithoutAgsUploadsInputSchema) ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -2140,12 +2235,28 @@ export const NestedEnumAgsUploadStatusWithAggregatesFilterSchema: z.ZodType<Pris
   _max: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional()
 }).strict();
 
+export const NestedIntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
+}).strict();
+
 export const UserProjectCreateWithoutUserInputSchema: z.ZodType<Prisma.UserProjectCreateWithoutUserInput> = z.object({
   role: z.lazy(() => RoleSchema),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   project: z.lazy(() => ProjectCreateNestedOneWithoutUserProjectsInputSchema),
-  AgsUpload: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.UserProjectUncheckedCreateWithoutUserInput> = z.object({
@@ -2153,7 +2264,7 @@ export const UserProjectUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   projectId: z.string(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.UserProjectCreateOrConnectWithoutUserInput> = z.object({
@@ -2243,16 +2354,22 @@ export const AgsUploadCreateWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsU
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  fileUrl: z.string(),
-  status: z.lazy(() => AgsUploadStatusSchema)
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
+  status: z.lazy(() => AgsUploadStatusSchema),
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable()
 }).strict();
 
 export const AgsUploadUncheckedCreateWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsUploadUncheckedCreateWithoutUserProjectInput> = z.object({
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  fileUrl: z.string(),
-  status: z.lazy(() => AgsUploadStatusSchema)
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
+  status: z.lazy(() => AgsUploadStatusSchema),
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable()
 }).strict();
 
 export const AgsUploadCreateOrConnectWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsUploadCreateOrConnectWithoutUserProjectInput> = z.object({
@@ -2324,7 +2441,7 @@ export const AgsUploadUpdateWithWhereUniqueWithoutUserProjectInputSchema: z.ZodT
 
 export const AgsUploadUpdateManyWithWhereWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsUploadUpdateManyWithWhereWithoutUserProjectInput> = z.object({
   where: z.lazy(() => AgsUploadScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => AgsUploadUpdateManyMutationInputSchema),z.lazy(() => AgsUploadUncheckedUpdateManyWithoutAgsUploadInputSchema) ]),
+  data: z.union([ z.lazy(() => AgsUploadUpdateManyMutationInputSchema),z.lazy(() => AgsUploadUncheckedUpdateManyWithoutAgsUploadsInputSchema) ]),
 }).strict();
 
 export const AgsUploadScalarWhereInputSchema: z.ZodType<Prisma.AgsUploadScalarWhereInput> = z.object({
@@ -2336,8 +2453,11 @@ export const AgsUploadScalarWhereInputSchema: z.ZodType<Prisma.AgsUploadScalarWh
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   projectId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  fileUrl: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  fileUrl: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   status: z.union([ z.lazy(() => EnumAgsUploadStatusFilterSchema),z.lazy(() => AgsUploadStatusSchema) ]).optional(),
+  newRecordsCount: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
 }).strict();
 
 export const LocationCreateWithoutProjectInputSchema: z.ZodType<Prisma.LocationCreateWithoutProjectInput> = z.object({
@@ -2375,7 +2495,7 @@ export const UserProjectCreateWithoutProjectInputSchema: z.ZodType<Prisma.UserPr
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutUserProjectsInputSchema),
-  AgsUpload: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedCreateWithoutProjectInputSchema: z.ZodType<Prisma.UserProjectUncheckedCreateWithoutProjectInput> = z.object({
@@ -2383,7 +2503,7 @@ export const UserProjectUncheckedCreateWithoutProjectInputSchema: z.ZodType<Pris
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   userId: z.string(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedCreateNestedManyWithoutUserProjectInputSchema).optional()
 }).strict();
 
 export const UserProjectCreateOrConnectWithoutProjectInputSchema: z.ZodType<Prisma.UserProjectCreateOrConnectWithoutProjectInput> = z.object({
@@ -2596,7 +2716,7 @@ export const ProjectUncheckedUpdateWithoutColumnDefinitionsInputSchema: z.ZodTyp
   userProjects: z.lazy(() => UserProjectUncheckedUpdateManyWithoutProjectNestedInputSchema).optional()
 }).strict();
 
-export const UserProjectCreateWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectCreateWithoutAgsUploadInput> = z.object({
+export const UserProjectCreateWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectCreateWithoutAgsUploadsInput> = z.object({
   role: z.lazy(() => RoleSchema),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -2604,7 +2724,7 @@ export const UserProjectCreateWithoutAgsUploadInputSchema: z.ZodType<Prisma.User
   project: z.lazy(() => ProjectCreateNestedOneWithoutUserProjectsInputSchema)
 }).strict();
 
-export const UserProjectUncheckedCreateWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectUncheckedCreateWithoutAgsUploadInput> = z.object({
+export const UserProjectUncheckedCreateWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectUncheckedCreateWithoutAgsUploadsInput> = z.object({
   role: z.lazy(() => RoleSchema),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -2612,17 +2732,17 @@ export const UserProjectUncheckedCreateWithoutAgsUploadInputSchema: z.ZodType<Pr
   projectId: z.string()
 }).strict();
 
-export const UserProjectCreateOrConnectWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectCreateOrConnectWithoutAgsUploadInput> = z.object({
+export const UserProjectCreateOrConnectWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectCreateOrConnectWithoutAgsUploadsInput> = z.object({
   where: z.lazy(() => UserProjectWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadInputSchema) ]),
+  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadsInputSchema) ]),
 }).strict();
 
-export const UserProjectUpsertWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectUpsertWithoutAgsUploadInput> = z.object({
-  update: z.union([ z.lazy(() => UserProjectUpdateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedUpdateWithoutAgsUploadInputSchema) ]),
-  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadInputSchema) ]),
+export const UserProjectUpsertWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectUpsertWithoutAgsUploadsInput> = z.object({
+  update: z.union([ z.lazy(() => UserProjectUpdateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedUpdateWithoutAgsUploadsInputSchema) ]),
+  create: z.union([ z.lazy(() => UserProjectCreateWithoutAgsUploadsInputSchema),z.lazy(() => UserProjectUncheckedCreateWithoutAgsUploadsInputSchema) ]),
 }).strict();
 
-export const UserProjectUpdateWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectUpdateWithoutAgsUploadInput> = z.object({
+export const UserProjectUpdateWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectUpdateWithoutAgsUploadsInput> = z.object({
   role: z.union([ z.lazy(() => RoleSchema),z.lazy(() => EnumRoleFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2630,7 +2750,7 @@ export const UserProjectUpdateWithoutAgsUploadInputSchema: z.ZodType<Prisma.User
   project: z.lazy(() => ProjectUpdateOneRequiredWithoutUserProjectsNestedInputSchema).optional()
 }).strict();
 
-export const UserProjectUncheckedUpdateWithoutAgsUploadInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateWithoutAgsUploadInput> = z.object({
+export const UserProjectUncheckedUpdateWithoutAgsUploadsInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateWithoutAgsUploadsInput> = z.object({
   role: z.union([ z.lazy(() => RoleSchema),z.lazy(() => EnumRoleFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2650,7 +2770,7 @@ export const UserProjectUpdateWithoutUserInputSchema: z.ZodType<Prisma.UserProje
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   project: z.lazy(() => ProjectUpdateOneRequiredWithoutUserProjectsNestedInputSchema).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateWithoutUserInput> = z.object({
@@ -2658,7 +2778,7 @@ export const UserProjectUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   projectId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedUpdateManyWithoutUserProjectsInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateManyWithoutUserProjectsInput> = z.object({
@@ -2672,32 +2792,44 @@ export const AgsUploadCreateManyUserProjectInputSchema: z.ZodType<Prisma.AgsUplo
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  fileUrl: z.string(),
-  status: z.lazy(() => AgsUploadStatusSchema)
+  fileUrl: z.string().optional().nullable(),
+  parsedRecordsUrl: z.string().optional().nullable(),
+  status: z.lazy(() => AgsUploadStatusSchema),
+  newRecordsCount: z.number().int().optional().nullable(),
+  updatedRecordsCount: z.number().int().optional().nullable()
 }).strict();
 
 export const AgsUploadUpdateWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsUploadUpdateWithoutUserProjectInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const AgsUploadUncheckedUpdateWithoutUserProjectInputSchema: z.ZodType<Prisma.AgsUploadUncheckedUpdateWithoutUserProjectInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const AgsUploadUncheckedUpdateManyWithoutAgsUploadInputSchema: z.ZodType<Prisma.AgsUploadUncheckedUpdateManyWithoutAgsUploadInput> = z.object({
+export const AgsUploadUncheckedUpdateManyWithoutAgsUploadsInputSchema: z.ZodType<Prisma.AgsUploadUncheckedUpdateManyWithoutAgsUploadsInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  fileUrl: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fileUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  parsedRecordsUrl: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   status: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => EnumAgsUploadStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  newRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  updatedRecordsCount: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const LocationCreateManyProjectInputSchema: z.ZodType<Prisma.LocationCreateManyProjectInput> = z.object({
@@ -2760,7 +2892,7 @@ export const UserProjectUpdateWithoutProjectInputSchema: z.ZodType<Prisma.UserPr
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutUserProjectsNestedInputSchema).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const UserProjectUncheckedUpdateWithoutProjectInputSchema: z.ZodType<Prisma.UserProjectUncheckedUpdateWithoutProjectInput> = z.object({
@@ -2768,7 +2900,7 @@ export const UserProjectUncheckedUpdateWithoutProjectInputSchema: z.ZodType<Pris
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  AgsUpload: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
+  agsUploads: z.lazy(() => AgsUploadUncheckedUpdateManyWithoutUserProjectNestedInputSchema).optional()
 }).strict();
 
 export const ColumnDefinitionUpdateWithoutProjectInputSchema: z.ZodType<Prisma.ColumnDefinitionUpdateWithoutProjectInput> = z.object({

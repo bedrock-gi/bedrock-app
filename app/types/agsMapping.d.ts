@@ -9,14 +9,19 @@ export type DataColumns<T extends ObjectWithStringKeys> = Omit<
   "createdAt" | "updatedAt" | "id" | "customColumns"
 >;
 
+type AgsUploadRecords<T extends ObjectWithStringKeys> = {
+  newRecords: DataColumns<T>[];
+  updatedRecords: T[];
+};
+
 type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
 
-  checkIfRecordExists: (
-    record: DataColumns<ObjectWithStringKeys>,
+  findExistingRecords: (
+    records: DataColumns<T>[],
     projectId: string
-  ) => Promise<boolean>;
+  ) => Promise<AgsUploadRecords<T>>;
 
   zodSchema: ZodPrismaType<T>;
   columns: {

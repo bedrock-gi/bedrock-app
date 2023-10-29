@@ -98,14 +98,17 @@ enum AgsUploadStatus {
 }
 
 model AgsUpload {
-  id          String          @id @default(uuid())
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  userProject UserProject     @relation(fields: [userId, projectId], references: [userId, projectId])
-  userId      String
-  projectId   String
-  fileUrl     String
-  status      AgsUploadStatus
+  id                  String          @id @default(uuid())
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  userProject         UserProject     @relation(fields: [userId, projectId], references: [userId, projectId])
+  userId              String
+  projectId           String
+  fileUrl             String?
+  parsedRecordsUrl    String?
+  status              AgsUploadStatus
+  newRecordsCount     Int?
+  updatedRecordsCount Int?
 }
 
 // model LabTest {

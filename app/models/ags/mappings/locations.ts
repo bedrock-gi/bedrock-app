@@ -8,15 +8,27 @@ import { LocationSchema } from "prisma/generated/zod";
 export const locationMapping: AgsMapping<Omit<Location, "projectId">> = {
   agsTableName: "LOCA",
   prismaLabel: "location",
-  checkIfRecordExists: async (record, projectId) => {
-    const { name } = record;
-
-    const existingRecord = await prisma.location.findMany({
+  findExistingRecords: async (records, projectId) => {
+    const existingRecords = await prisma.location.findMany({
       where: {
-        name,
+        projectId,
+        name: {
+          in: records.map((record) => record.name),
+        },
       },
     });
-    return existingRecord.length > 0;
+
+    const newRecords = records.filter(
+      (record) =>
+        !existingRecords.find(
+          (existingRecord) => existingRecord.name === record.name
+        )
+    );
+
+    return {
+      newRecords,
+      updatedRecords: existingRecords,
+    };
   },
 
   columns: {
