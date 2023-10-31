@@ -20,6 +20,7 @@ export const parseRecordsToZod = <T extends ObjectWithStringKeys>(
       return zodSchema.parse(record);
     } catch (error) {
       errors.push(error as string);
+      //   throw error;
       return undefined;
     }
   });
@@ -64,6 +65,25 @@ export function makeSchemaCoercePrimitives<
   return z.object(updatedShape) as T;
 }
 
+export function makeNullableOptional<
+  T extends ZodObject<X>,
+  X extends ObjectWithStringKeys
+>(schema: T): T {
+  const shape = schema._def.shape();
+
+  const updatedShape = Object.fromEntries(
+    Object.entries(shape).map(([key, value]: [string, ZodTypeAny]) => {
+      if (value instanceof ZodNullable) {
+        return [key, value._def.innerType.optional()];
+      }
+
+      return [key, value];
+    })
+  );
+
+  return z.object(updatedShape) as T;
+}
+
 export function removePrismaFieldsFromSchema<
   T extends ZodObject<X>,
   X extends ObjectWithStringKeys
@@ -80,5 +100,8 @@ export function prepareAgsZodSchema<
   T extends ZodObject<X>,
   X extends ObjectWithStringKeys
 >(schema: T): T {
-  return removePrismaFieldsFromSchema(makeSchemaCoercePrimitives(schema));
+  const newSchema = removePrismaFieldsFromSchema(
+    makeSchemaCoercePrimitives(schema)
+  );
+  return makeNullableOptional(newSchema);
 }

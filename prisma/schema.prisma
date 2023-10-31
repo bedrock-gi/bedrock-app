@@ -57,15 +57,56 @@ enum Role {
 }
 
 model Location {
-  id            String   @id @default(uuid())
-  name          String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId     String
-  latitude      Float?
-  longitude     Float?
-  customColumns Json?
+  id                       String    @id @default(uuid())
+  name                     String
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  project                  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId                String
+  latitude                 Float?
+  longitude                Float?
+  customColumns            Json?
+  // Additional fields based on AGS data format
+  locationType             String? // Text listed in ABBR Group Abbreviations
+  locationStatus           String? // Text listed in ABBR Group Abbreviations
+  nationalEasting          Float? // nDP Value with required number of decimal places
+  nationalNorthing         Float? // nDP Value with required number of decimal places
+  gridReference            String? // Text listed in ABBR group
+  groundLevel              Float? // nDP Value with required number of decimal places
+  remarks                  String? // Text Abbreviations
+  finalDepth               Float? // nDP Value with required number of decimal places
+  startDate                DateTime? // Date time in international format
+  purpose                  String? // Text listed in ABBR Group Abbreviations
+  termination              String? // Text listed in ABBR Group Abbreviations
+  endDate                  DateTime? // Date time in international format
+  gridReferenceLetter      String? // Text Abbreviations
+  localGridX               Float? // nDP Value with required number of decimal places
+  localGridY               Float? // nDP Value with required number of decimal places
+  localDatumLevel          Float? // nDP Value with required number of decimal places
+  localGridSystem          String? // Text listed in ABBR Group Abbreviations
+  localDatumSystem         String? // Text listed in ABBR Group Abbreviations
+  endOfTraverseEasting     Float? // nDP Value with required number of decimal places
+  endOfTraverseNorthing    Float? // nDP Value with required number of decimal places
+  endOfTraverseGroundLevel Float? // nDP Value with required number of decimal places
+  localGridEasting         Float? // nDP Value with required number of decimal places
+  localGridNorthing        Float? // nDP Value with required number of decimal places
+  localElevation           Float? // nDP Value with required number of decimal places
+
+  latitudeEnd             String? // DMS Degrees:Minutes:Seconds
+  longitudeEnd            String? // DMS Degrees:Minutes:Seconds
+  projectionFormat        String? // Text
+  locationMethod          String? // Text listed in ABBR Group Abbreviations
+  locationSubdivision     String? // Text listed in ABBR Group Abbreviations
+  phaseGrouping           String? // Text listed in ABBR Group Abbreviations
+  alignmentId             String? // Text listed in ABBR Group Abbreviations
+  offset                  Float? // nDP Value with required number of decimal places
+  chainage                String? // Text
+  transformDetails        String? // Text
+  associatedFileReference String? // Text
+  nationalDatum           String? // Text listed in ABBR Group Abbreviations
+  originalHoleId          String? // Text
+  originalJobReference    String? // Text
+  originatingCompany      String? // Text
 }
 
 model Sample {

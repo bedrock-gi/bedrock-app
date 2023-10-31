@@ -29,7 +29,7 @@ type AgsMapping<T extends ObjectWithStringKeys> = {
     projectId: string
   ) => Promise<AgsUploadRecords<T>>;
 
-  zodSchema: ZodPrismaType<T>;
+  zodSchema: ZodPrismaType;
   columns: {
     [agsColumnName: string]: keyof DataColumns<T>;
   };
