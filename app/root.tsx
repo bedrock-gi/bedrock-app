@@ -1,6 +1,7 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
@@ -32,6 +33,7 @@ export default function App() {
       </head>
 
       <body>
+        <ToastContainer />
         <div className="flex h-screen flex-row">
           <div className="h-full w-1/5">
             <Sidebar></Sidebar>

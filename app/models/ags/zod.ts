@@ -38,12 +38,23 @@ export function makeSchemaCoercePrimitives<
   const updatedShape = Object.fromEntries(
     Object.entries(shape).map(([key, value]: [string, ZodTypeAny]) => {
       if (value instanceof ZodNumber) {
-        return [key, z.coerce.number()];
+        // parses non empty string to number, empty string to undefined, number to number
+        return [
+          key,
+          z.number().or(z.string().nonempty()).pipe(z.coerce.number()),
+        ];
       } else if (
         value instanceof ZodNullable &&
         value._def.innerType instanceof ZodNumber
       ) {
-        return [key, z.coerce.number().optional()];
+        return [
+          key,
+          z
+            .literal("")
+            .transform(() => undefined)
+            .or(z.coerce.number())
+            .optional(),
+        ];
       }
 
       return [key, value];

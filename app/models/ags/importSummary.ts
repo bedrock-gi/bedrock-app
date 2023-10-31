@@ -4,8 +4,9 @@ import { mappings } from "./mappings";
 import type AgsMapping from "../../types/agsMapping";
 
 import { parseAgsGroup } from "./parse";
-import { ObjectWithStringKeys } from "../../types/agsMapping";
-import { writeFileSync } from "fs";
+import type { ObjectWithStringKeys } from "../../types/agsMapping";
+import { readFileSync, writeFileSync } from "fs";
+import type { AgsUpload } from "@prisma/client";
 
 type AgsUploadSummary = {
   numNewRecords: number;
@@ -13,24 +14,14 @@ type AgsUploadSummary = {
   mapping: AgsMapping<any>;
 };
 
-// type AgsRecordsBlob = {
-//   newRecords: ObjectWithStringKeys[];
-//   updatedRecords: ObjectWithStringKeys[];
-//   mappingKey: keyof typeof mappings;
-//   uploadId: string;
-// };
+type AgsUploadSummaryBlob = {
+  newRecords: ObjectWithStringKeys[];
+  updatedRecords: ObjectWithStringKeys[];
+  mappingKey: keyof typeof mappings;
+};
 
-function saveRecordsToBlob(
-  uploadId: string,
-  newRecords: ObjectWithStringKeys[],
-  updatedRecords: ObjectWithStringKeys[],
-  mappingKey: keyof typeof mappings
-) {
-  const asJson = JSON.stringify({
-    newRecords,
-    updatedRecords,
-    mappingKey,
-  });
+function saveRecordsToBlob(uploadId: string, records: AgsUploadSummaryBlob[]) {
+  const asJson = JSON.stringify(records);
 
   writeFileSync(`./uploads/${uploadId}.json`, asJson);
 }
@@ -61,14 +52,14 @@ export async function createAgsImportSummary(
 
   const groups = await Promise.all(agsGroups);
 
-  groups.forEach((group) => {
-    saveRecordsToBlob(
-      uploadId,
-      group.newRecords,
-      group.updatedRecords,
-      group.key as keyof typeof mappings
-    );
-  });
+  saveRecordsToBlob(
+    uploadId,
+    groups.map((group) => ({
+      newRecords: group.newRecords,
+      updatedRecords: group.updatedRecords,
+      mappingKey: group.key as keyof typeof mappings,
+    }))
+  );
 
   const agsUploadSummary: AgsUploadSummary[] = groups.map((group) => {
     return {
@@ -79,4 +70,19 @@ export async function createAgsImportSummary(
   });
 
   return agsUploadSummary;
+}
+
+export async function uploadToPrismaFromBlob(upload: AgsUpload) {
+  const blob = readFileSync(`./uploads/${upload.id}.json`, "utf-8");
+  const agsUpload: AgsUploadSummaryBlob[] = JSON.parse(blob);
+  console.log(agsUpload);
+
+  agsUpload.forEach(async (group) => {
+    const mapping = mappings[group.mappingKey];
+
+    // @ts-ignore We can ignore as we have already parsed and validated with zod
+    await mapping.createRecords(group.newRecords, upload.projectId);
+    // @ts-ignore We can ignore as we have already parsed and validated with zod
+    await mapping.updateRecords(group.updatedRecords);
+  });
 }

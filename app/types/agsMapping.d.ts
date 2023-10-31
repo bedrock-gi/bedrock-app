@@ -18,6 +18,12 @@ type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
 
+  createRecords: (
+    records: DataColumns<T>[],
+    projectId: string
+  ) => Promise<void>;
+  updateRecords: (records: T[]) => Promise<void>;
+
   findExistingRecords: (
     records: DataColumns<T>[],
     projectId: string

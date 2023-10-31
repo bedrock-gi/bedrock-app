@@ -1,11 +1,16 @@
-import type { LoaderArgs } from "@remix-run/node";
+import { ActionArgs, LoaderArgs, json } from "@remix-run/node";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
 import { readFileSync } from "fs";
-import { createAgsImportSummary } from "~/models/ags/importSummary";
+import {
+  createAgsImportSummary,
+  uploadToPrismaFromBlob,
+} from "~/models/ags/importSummary";
 import { getAgsUpload } from "~/models/prisma/agsUploads";
-import { Form } from "@remix-run/react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
 export const loader = async ({ params, request }: LoaderArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
@@ -35,8 +40,48 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return typedjson({ role, upload, parsed });
 };
 
+export const action = async ({ request, params }: ActionArgs) => {
+  if (!params.projectId) {
+    throw new Error("Project not found");
+  }
+
+  const role = await requireUserProjectRole(request, params.projectId);
+  if (!role) {
+    throw new Error("Project not found");
+  }
+
+  if (!params.uploadId) {
+    throw new Error("Upload not found");
+  }
+
+  const upload = await getAgsUpload(params.uploadId);
+  if (!upload || !upload.fileUrl) {
+    throw new Error("Upload not found");
+  }
+
+  console.log("uploading");
+  await uploadToPrismaFromBlob(upload);
+  console.log("upload complete");
+
+  return typedjson({ status: 200, message: "ok" });
+};
+
 export default function () {
   const data = useTypedLoaderData<typeof loader>();
+
+  const actionData = useActionData<typeof action>();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (actionData?.message === "ok") {
+      toast("Upload Complete", {
+        type: "success",
+      });
+      nav(`/projects/${data.role.projectId}`);
+    } else if (actionData?.message) {
+      // toast(actionData.message);
+    }
+  }, [actionData, data.role.projectId, nav]);
 
   return (
     <div>
