@@ -1,5 +1,5 @@
-import { ActionArgs, LoaderArgs, json } from "@remix-run/node";
-import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
+import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
 import { readFileSync } from "fs";
@@ -11,24 +11,17 @@ import { getAgsUpload } from "~/models/prisma/agsUploads";
 import { Form, useActionData, useNavigate } from "@remix-run/react";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import invariant from "tiny-invariant";
 export const loader = async ({ params, request }: LoaderArgs) => {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    return redirect("/projects");
-  }
-
-  if (!params.uploadId) {
-    return redirect(`/projects/${params.projectId}/upload`);
-  }
+  invariant(role);
+  invariant(params.uploadId);
 
   const upload = await getAgsUpload(params.uploadId);
-  if (!upload || !upload.fileUrl) {
-    return redirect(`/projects/${params.projectId}/upload`);
-  }
+  invariant(upload);
+  invariant(upload.fileUrl);
 
   const fileData = await readFileSync(upload.fileUrl, "utf8");
   const parsed = await createAgsImportSummary(
@@ -41,27 +34,17 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 };
 
 export const action = async ({ request, params }: ActionArgs) => {
-  if (!params.projectId) {
-    throw new Error("Project not found");
-  }
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    throw new Error("Project not found");
-  }
-
-  if (!params.uploadId) {
-    throw new Error("Upload not found");
-  }
+  invariant(role);
+  invariant(params.uploadId);
 
   const upload = await getAgsUpload(params.uploadId);
-  if (!upload || !upload.fileUrl) {
-    throw new Error("Upload not found");
-  }
+  invariant(upload);
+  invariant(upload.fileUrl);
 
-  console.log("uploading");
   await uploadToPrismaFromBlob(upload);
-  console.log("upload complete");
 
   return typedjson({ status: 200, message: "ok" });
 };

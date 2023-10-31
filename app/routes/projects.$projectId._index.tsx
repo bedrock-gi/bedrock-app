@@ -1,7 +1,8 @@
 import type { Location } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import invariant from "tiny-invariant";
 import { LocationsMap } from "~/components/Map/LocationsMap";
 import { Table } from "~/components/Table/Table";
 import type { TableConfig } from "~/components/Table/TableConfig";
@@ -27,14 +28,10 @@ const locationTableConfig: TableConfig<Location> = {
 };
 
 export async function loader({ params, request }: LoaderArgs) {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    return redirect("/projects");
-  }
+  invariant(role);
 
   const locations = await getLocations(params.projectId);
   if (locations.length === 0) {
