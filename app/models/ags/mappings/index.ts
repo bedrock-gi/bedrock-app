@@ -1,5 +1,5 @@
 import type AgsMapping from "../../../types/agsMapping";
-import { locationMapping } from "./locations";
+import { locationMapping } from "./location";
 
 export type TableMapping = {
   [key in PrismaTable]: AgsMapping<any>;

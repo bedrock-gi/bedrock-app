@@ -7,7 +7,7 @@ import invariant from "tiny-invariant";
 import { LocationsMap } from "~/components/Map/LocationsMap";
 import { Table } from "~/components/Table/Table";
 import { TableConfig } from "~/components/Table/TableConfig";
-import { locationMapping } from "~/models/ags/mappings/locations";
+import { locationMapping } from "~/models/ags/mappings/location";
 import { getLocations, seedLocations } from "~/models/prisma/locations";
 
 import { requireUserProjectRole } from "~/utils/auth.server";

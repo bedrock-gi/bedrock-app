@@ -58,7 +58,7 @@ export const ProjectScalarFieldEnumSchema = z.enum(['id','name','description','c
 
 export const LocationScalarFieldEnumSchema = z.enum(['id','name','createdAt','updatedAt','projectId','latitude','longitude','customColumns','locationType','locationStatus','nationalEasting','nationalNorthing','gridReference','groundLevel','remarks','finalDepth','startDate','purpose','termination','endDate','gridReferenceLetter','localGridX','localGridY','localDatumLevel','localGridSystem','localDatumSystem','endOfTraverseEasting','endOfTraverseNorthing','endOfTraverseGroundLevel','localGridEasting','localGridNorthing','localElevation','latitudeEnd','longitudeEnd','projectionFormat','locationMethod','locationSubdivision','phaseGrouping','alignmentId','offset','chainage','transformDetails','associatedFileReference','nationalDatum','originalHoleId','originalJobReference','originatingCompany']);
 
-export const SampleScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt']);
+export const SampleScalarFieldEnumSchema = z.enum(['id','createdAt','updatedAt','locationId','depthTop','sampleReference','sampleType','sampleUniqueID','depthBase','dateAndTimeSampleTaken','numBlowsRequired','sampleContainer','samplePreparation','sampleDiameter','depthToWaterBelowGroundSurface','percentageSampleRecovered','samplingTechnique','sampleMatrix','sampleQAType','samplerInitials','reasonForSampling','sampleRemarks','sampleDescription','dateSampleDescribed','personResponsibleForDescription','sampleCondition','sampleClassification','barometricPressure','sampleTemperature','gasPressureAboveBarometric','gasFlowRate','dateAndTimeSamplingCompleted','samplingDuration','captionUsedToDescribeSample','sampleRecordLink','stratumReference','associatedFileReference','lengthSampleRecovered']);
 
 export const ColumnDefinitionScalarFieldEnumSchema = z.enum(['id','columnId','tableId','projectId','label','dataType']);
 
@@ -196,6 +196,41 @@ export const SampleSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  locationId: z.string(),
+  depthTop: z.number().nullable(),
+  sampleReference: z.string().nullable(),
+  sampleType: z.string().nullable(),
+  sampleUniqueID: z.string().nullable(),
+  depthBase: z.number().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().nullable(),
+  numBlowsRequired: z.number().int().nullable(),
+  sampleContainer: z.string().nullable(),
+  samplePreparation: z.string().nullable(),
+  sampleDiameter: z.number().nullable(),
+  depthToWaterBelowGroundSurface: z.number().nullable(),
+  percentageSampleRecovered: z.number().nullable(),
+  samplingTechnique: z.string().nullable(),
+  sampleMatrix: z.string().nullable(),
+  sampleQAType: z.string().nullable(),
+  samplerInitials: z.string().nullable(),
+  reasonForSampling: z.string().nullable(),
+  sampleRemarks: z.string().nullable(),
+  sampleDescription: z.string().nullable(),
+  dateSampleDescribed: z.coerce.date().nullable(),
+  personResponsibleForDescription: z.string().nullable(),
+  sampleCondition: z.string().nullable(),
+  sampleClassification: z.string().nullable(),
+  barometricPressure: z.number().nullable(),
+  sampleTemperature: z.number().nullable(),
+  gasPressureAboveBarometric: z.number().nullable(),
+  gasFlowRate: z.number().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().nullable(),
+  samplingDuration: z.string().nullable(),
+  captionUsedToDescribeSample: z.string().nullable(),
+  sampleRecordLink: z.string().nullable(),
+  stratumReference: z.string().nullable(),
+  associatedFileReference: z.string().nullable(),
+  lengthSampleRecovered: z.number().nullable(),
 })
 
 export type Sample = z.infer<typeof SampleSchema>
@@ -346,11 +381,21 @@ export const ProjectSelectSchema: z.ZodType<Prisma.ProjectSelect> = z.object({
 
 export const LocationIncludeSchema: z.ZodType<Prisma.LocationInclude> = z.object({
   project: z.union([z.boolean(),z.lazy(() => ProjectArgsSchema)]).optional(),
+  samples: z.union([z.boolean(),z.lazy(() => SampleFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => LocationCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
 export const LocationArgsSchema: z.ZodType<Prisma.LocationArgs> = z.object({
   select: z.lazy(() => LocationSelectSchema).optional(),
   include: z.lazy(() => LocationIncludeSchema).optional(),
+}).strict();
+
+export const LocationCountOutputTypeArgsSchema: z.ZodType<Prisma.LocationCountOutputTypeArgs> = z.object({
+  select: z.lazy(() => LocationCountOutputTypeSelectSchema).nullish(),
+}).strict();
+
+export const LocationCountOutputTypeSelectSchema: z.ZodType<Prisma.LocationCountOutputTypeSelect> = z.object({
+  samples: z.boolean().optional(),
 }).strict();
 
 export const LocationSelectSchema: z.ZodType<Prisma.LocationSelect> = z.object({
@@ -402,15 +447,62 @@ export const LocationSelectSchema: z.ZodType<Prisma.LocationSelect> = z.object({
   originalJobReference: z.boolean().optional(),
   originatingCompany: z.boolean().optional(),
   project: z.union([z.boolean(),z.lazy(() => ProjectArgsSchema)]).optional(),
+  samples: z.union([z.boolean(),z.lazy(() => SampleFindManyArgsSchema)]).optional(),
+  _count: z.union([z.boolean(),z.lazy(() => LocationCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
 // SAMPLE
 //------------------------------------------------------
 
+export const SampleIncludeSchema: z.ZodType<Prisma.SampleInclude> = z.object({
+  location: z.union([z.boolean(),z.lazy(() => LocationArgsSchema)]).optional(),
+}).strict()
+
+export const SampleArgsSchema: z.ZodType<Prisma.SampleArgs> = z.object({
+  select: z.lazy(() => SampleSelectSchema).optional(),
+  include: z.lazy(() => SampleIncludeSchema).optional(),
+}).strict();
+
 export const SampleSelectSchema: z.ZodType<Prisma.SampleSelect> = z.object({
   id: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
+  locationId: z.boolean().optional(),
+  depthTop: z.boolean().optional(),
+  sampleReference: z.boolean().optional(),
+  sampleType: z.boolean().optional(),
+  sampleUniqueID: z.boolean().optional(),
+  depthBase: z.boolean().optional(),
+  dateAndTimeSampleTaken: z.boolean().optional(),
+  numBlowsRequired: z.boolean().optional(),
+  sampleContainer: z.boolean().optional(),
+  samplePreparation: z.boolean().optional(),
+  sampleDiameter: z.boolean().optional(),
+  depthToWaterBelowGroundSurface: z.boolean().optional(),
+  percentageSampleRecovered: z.boolean().optional(),
+  samplingTechnique: z.boolean().optional(),
+  sampleMatrix: z.boolean().optional(),
+  sampleQAType: z.boolean().optional(),
+  samplerInitials: z.boolean().optional(),
+  reasonForSampling: z.boolean().optional(),
+  sampleRemarks: z.boolean().optional(),
+  sampleDescription: z.boolean().optional(),
+  dateSampleDescribed: z.boolean().optional(),
+  personResponsibleForDescription: z.boolean().optional(),
+  sampleCondition: z.boolean().optional(),
+  sampleClassification: z.boolean().optional(),
+  barometricPressure: z.boolean().optional(),
+  sampleTemperature: z.boolean().optional(),
+  gasPressureAboveBarometric: z.boolean().optional(),
+  gasFlowRate: z.boolean().optional(),
+  dateAndTimeSamplingCompleted: z.boolean().optional(),
+  samplingDuration: z.boolean().optional(),
+  captionUsedToDescribeSample: z.boolean().optional(),
+  sampleRecordLink: z.boolean().optional(),
+  stratumReference: z.boolean().optional(),
+  associatedFileReference: z.boolean().optional(),
+  lengthSampleRecovered: z.boolean().optional(),
+  location: z.union([z.boolean(),z.lazy(() => LocationArgsSchema)]).optional(),
 }).strict()
 
 // COLUMN DEFINITION
@@ -668,6 +760,7 @@ export const LocationWhereInputSchema: z.ZodType<Prisma.LocationWhereInput> = z.
   originalJobReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   originatingCompany: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   project: z.union([ z.lazy(() => ProjectRelationFilterSchema),z.lazy(() => ProjectWhereInputSchema) ]).optional(),
+  samples: z.lazy(() => SampleListRelationFilterSchema).optional()
 }).strict();
 
 export const LocationOrderByWithRelationInputSchema: z.ZodType<Prisma.LocationOrderByWithRelationInput> = z.object({
@@ -718,7 +811,8 @@ export const LocationOrderByWithRelationInputSchema: z.ZodType<Prisma.LocationOr
   originalHoleId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   originalJobReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   originatingCompany: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional()
+  project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
+  samples: z.lazy(() => SampleOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const LocationWhereUniqueInputSchema: z.ZodType<Prisma.LocationWhereUniqueInput> = z.object({
@@ -840,12 +934,84 @@ export const SampleWhereInputSchema: z.ZodType<Prisma.SampleWhereInput> = z.obje
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  locationId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  depthTop: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  depthBase: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleContainer: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  samplePreparation: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleDiameter: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  samplingTechnique: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleMatrix: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleQAType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  samplerInitials: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  reasonForSampling: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleRemarks: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleDescription: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleCondition: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleClassification: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  barometricPressure: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleTemperature: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  gasFlowRate: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  samplingDuration: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  stratumReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  associatedFileReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  location: z.union([ z.lazy(() => LocationRelationFilterSchema),z.lazy(() => LocationWhereInputSchema) ]).optional(),
 }).strict();
 
 export const SampleOrderByWithRelationInputSchema: z.ZodType<Prisma.SampleOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  locationId: z.lazy(() => SortOrderSchema).optional(),
+  depthTop: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleUniqueID: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  depthBase: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateAndTimeSampleTaken: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  numBlowsRequired: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleContainer: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplePreparation: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleDiameter: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  depthToWaterBelowGroundSurface: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  percentageSampleRecovered: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplingTechnique: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleMatrix: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleQAType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplerInitials: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  reasonForSampling: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleRemarks: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleDescription: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateSampleDescribed: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  personResponsibleForDescription: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleCondition: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleClassification: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  barometricPressure: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleTemperature: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  gasPressureAboveBarometric: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  gasFlowRate: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateAndTimeSamplingCompleted: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplingDuration: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  captionUsedToDescribeSample: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleRecordLink: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  stratumReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  associatedFileReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  lengthSampleRecovered: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  location: z.lazy(() => LocationOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const SampleWhereUniqueInputSchema: z.ZodType<Prisma.SampleWhereUniqueInput> = z.object({
@@ -856,9 +1022,46 @@ export const SampleOrderByWithAggregationInputSchema: z.ZodType<Prisma.SampleOrd
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  locationId: z.lazy(() => SortOrderSchema).optional(),
+  depthTop: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleUniqueID: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  depthBase: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateAndTimeSampleTaken: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  numBlowsRequired: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleContainer: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplePreparation: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleDiameter: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  depthToWaterBelowGroundSurface: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  percentageSampleRecovered: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplingTechnique: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleMatrix: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleQAType: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplerInitials: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  reasonForSampling: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleRemarks: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleDescription: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateSampleDescribed: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  personResponsibleForDescription: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleCondition: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleClassification: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  barometricPressure: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleTemperature: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  gasPressureAboveBarometric: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  gasFlowRate: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  dateAndTimeSamplingCompleted: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  samplingDuration: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  captionUsedToDescribeSample: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  sampleRecordLink: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  stratumReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  associatedFileReference: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  lengthSampleRecovered: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => SampleCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => SampleAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => SampleMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => SampleMinOrderByAggregateInputSchema).optional()
+  _min: z.lazy(() => SampleMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => SampleSumOrderByAggregateInputSchema).optional()
 }).strict();
 
 export const SampleScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.SampleScalarWhereWithAggregatesInput> = z.object({
@@ -868,6 +1071,41 @@ export const SampleScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Sample
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  locationId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  depthTop: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  sampleReference: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleType: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  depthBase: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.lazy(() => IntNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  sampleContainer: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  samplePreparation: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleDiameter: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  samplingTechnique: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleMatrix: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleQAType: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  samplerInitials: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  reasonForSampling: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleRemarks: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleDescription: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleCondition: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleClassification: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  barometricPressure: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  sampleTemperature: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  gasFlowRate: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  samplingDuration: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  stratumReference: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  associatedFileReference: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.lazy(() => FloatNullableWithAggregatesFilterSchema),z.number() ]).optional().nullable(),
 }).strict();
 
 export const ColumnDefinitionWhereInputSchema: z.ZodType<Prisma.ColumnDefinitionWhereInput> = z.object({
@@ -1223,7 +1461,8 @@ export const LocationCreateInputSchema: z.ZodType<Prisma.LocationCreateInput> = 
   originalHoleId: z.string().optional().nullable(),
   originalJobReference: z.string().optional().nullable(),
   originatingCompany: z.string().optional().nullable(),
-  project: z.lazy(() => ProjectCreateNestedOneWithoutLocationsInputSchema)
+  project: z.lazy(() => ProjectCreateNestedOneWithoutLocationsInputSchema),
+  samples: z.lazy(() => SampleCreateNestedManyWithoutLocationInputSchema).optional()
 }).strict();
 
 export const LocationUncheckedCreateInputSchema: z.ZodType<Prisma.LocationUncheckedCreateInput> = z.object({
@@ -1273,7 +1512,8 @@ export const LocationUncheckedCreateInputSchema: z.ZodType<Prisma.LocationUnchec
   nationalDatum: z.string().optional().nullable(),
   originalHoleId: z.string().optional().nullable(),
   originalJobReference: z.string().optional().nullable(),
-  originatingCompany: z.string().optional().nullable()
+  originatingCompany: z.string().optional().nullable(),
+  samples: z.lazy(() => SampleUncheckedCreateNestedManyWithoutLocationInputSchema).optional()
 }).strict();
 
 export const LocationUpdateInputSchema: z.ZodType<Prisma.LocationUpdateInput> = z.object({
@@ -1323,7 +1563,8 @@ export const LocationUpdateInputSchema: z.ZodType<Prisma.LocationUpdateInput> = 
   originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  project: z.lazy(() => ProjectUpdateOneRequiredWithoutLocationsNestedInputSchema).optional()
+  project: z.lazy(() => ProjectUpdateOneRequiredWithoutLocationsNestedInputSchema).optional(),
+  samples: z.lazy(() => SampleUpdateManyWithoutLocationNestedInputSchema).optional()
 }).strict();
 
 export const LocationUncheckedUpdateInputSchema: z.ZodType<Prisma.LocationUncheckedUpdateInput> = z.object({
@@ -1374,6 +1615,7 @@ export const LocationUncheckedUpdateInputSchema: z.ZodType<Prisma.LocationUnchec
   originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samples: z.lazy(() => SampleUncheckedUpdateManyWithoutLocationNestedInputSchema).optional()
 }).strict();
 
 export const LocationCreateManyInputSchema: z.ZodType<Prisma.LocationCreateManyInput> = z.object({
@@ -1528,43 +1770,287 @@ export const LocationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.LocationUn
 export const SampleCreateInputSchema: z.ZodType<Prisma.SampleCreateInput> = z.object({
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable(),
+  location: z.lazy(() => LocationCreateNestedOneWithoutSamplesInputSchema)
 }).strict();
 
 export const SampleUncheckedCreateInputSchema: z.ZodType<Prisma.SampleUncheckedCreateInput> = z.object({
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  locationId: z.string(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable()
 }).strict();
 
 export const SampleUpdateInputSchema: z.ZodType<Prisma.SampleUpdateInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  location: z.lazy(() => LocationUpdateOneRequiredWithoutSamplesNestedInputSchema).optional()
 }).strict();
 
 export const SampleUncheckedUpdateInputSchema: z.ZodType<Prisma.SampleUncheckedUpdateInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  locationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const SampleCreateManyInputSchema: z.ZodType<Prisma.SampleCreateManyInput> = z.object({
   id: z.string().uuid().optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  locationId: z.string(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable()
 }).strict();
 
 export const SampleUpdateManyMutationInputSchema: z.ZodType<Prisma.SampleUpdateManyMutationInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const SampleUncheckedUpdateManyInputSchema: z.ZodType<Prisma.SampleUncheckedUpdateManyInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  locationId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ColumnDefinitionCreateInputSchema: z.ZodType<Prisma.ColumnDefinitionCreateInput> = z.object({
@@ -1994,6 +2480,16 @@ export const DateTimeNullableFilterSchema: z.ZodType<Prisma.DateTimeNullableFilt
   not: z.union([ z.coerce.date(),z.lazy(() => NestedDateTimeNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
+export const SampleListRelationFilterSchema: z.ZodType<Prisma.SampleListRelationFilter> = z.object({
+  every: z.lazy(() => SampleWhereInputSchema).optional(),
+  some: z.lazy(() => SampleWhereInputSchema).optional(),
+  none: z.lazy(() => SampleWhereInputSchema).optional()
+}).strict();
+
+export const SampleOrderByRelationAggregateInputSchema: z.ZodType<Prisma.SampleOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
 export const LocationCountOrderByAggregateInputSchema: z.ZodType<Prisma.LocationCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
@@ -2229,22 +2725,187 @@ export const DateTimeNullableWithAggregatesFilterSchema: z.ZodType<Prisma.DateTi
   _max: z.lazy(() => NestedDateTimeNullableFilterSchema).optional()
 }).strict();
 
+export const IntNullableFilterSchema: z.ZodType<Prisma.IntNullableFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableFilterSchema) ]).optional().nullable(),
+}).strict();
+
+export const LocationRelationFilterSchema: z.ZodType<Prisma.LocationRelationFilter> = z.object({
+  is: z.lazy(() => LocationWhereInputSchema).optional().nullable(),
+  isNot: z.lazy(() => LocationWhereInputSchema).optional().nullable()
+}).strict();
+
 export const SampleCountOrderByAggregateInputSchema: z.ZodType<Prisma.SampleCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  locationId: z.lazy(() => SortOrderSchema).optional(),
+  depthTop: z.lazy(() => SortOrderSchema).optional(),
+  sampleReference: z.lazy(() => SortOrderSchema).optional(),
+  sampleType: z.lazy(() => SortOrderSchema).optional(),
+  sampleUniqueID: z.lazy(() => SortOrderSchema).optional(),
+  depthBase: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSampleTaken: z.lazy(() => SortOrderSchema).optional(),
+  numBlowsRequired: z.lazy(() => SortOrderSchema).optional(),
+  sampleContainer: z.lazy(() => SortOrderSchema).optional(),
+  samplePreparation: z.lazy(() => SortOrderSchema).optional(),
+  sampleDiameter: z.lazy(() => SortOrderSchema).optional(),
+  depthToWaterBelowGroundSurface: z.lazy(() => SortOrderSchema).optional(),
+  percentageSampleRecovered: z.lazy(() => SortOrderSchema).optional(),
+  samplingTechnique: z.lazy(() => SortOrderSchema).optional(),
+  sampleMatrix: z.lazy(() => SortOrderSchema).optional(),
+  sampleQAType: z.lazy(() => SortOrderSchema).optional(),
+  samplerInitials: z.lazy(() => SortOrderSchema).optional(),
+  reasonForSampling: z.lazy(() => SortOrderSchema).optional(),
+  sampleRemarks: z.lazy(() => SortOrderSchema).optional(),
+  sampleDescription: z.lazy(() => SortOrderSchema).optional(),
+  dateSampleDescribed: z.lazy(() => SortOrderSchema).optional(),
+  personResponsibleForDescription: z.lazy(() => SortOrderSchema).optional(),
+  sampleCondition: z.lazy(() => SortOrderSchema).optional(),
+  sampleClassification: z.lazy(() => SortOrderSchema).optional(),
+  barometricPressure: z.lazy(() => SortOrderSchema).optional(),
+  sampleTemperature: z.lazy(() => SortOrderSchema).optional(),
+  gasPressureAboveBarometric: z.lazy(() => SortOrderSchema).optional(),
+  gasFlowRate: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSamplingCompleted: z.lazy(() => SortOrderSchema).optional(),
+  samplingDuration: z.lazy(() => SortOrderSchema).optional(),
+  captionUsedToDescribeSample: z.lazy(() => SortOrderSchema).optional(),
+  sampleRecordLink: z.lazy(() => SortOrderSchema).optional(),
+  stratumReference: z.lazy(() => SortOrderSchema).optional(),
+  associatedFileReference: z.lazy(() => SortOrderSchema).optional(),
+  lengthSampleRecovered: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SampleAvgOrderByAggregateInputSchema: z.ZodType<Prisma.SampleAvgOrderByAggregateInput> = z.object({
+  depthTop: z.lazy(() => SortOrderSchema).optional(),
+  depthBase: z.lazy(() => SortOrderSchema).optional(),
+  numBlowsRequired: z.lazy(() => SortOrderSchema).optional(),
+  sampleDiameter: z.lazy(() => SortOrderSchema).optional(),
+  depthToWaterBelowGroundSurface: z.lazy(() => SortOrderSchema).optional(),
+  percentageSampleRecovered: z.lazy(() => SortOrderSchema).optional(),
+  barometricPressure: z.lazy(() => SortOrderSchema).optional(),
+  sampleTemperature: z.lazy(() => SortOrderSchema).optional(),
+  gasPressureAboveBarometric: z.lazy(() => SortOrderSchema).optional(),
+  gasFlowRate: z.lazy(() => SortOrderSchema).optional(),
+  lengthSampleRecovered: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const SampleMaxOrderByAggregateInputSchema: z.ZodType<Prisma.SampleMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  locationId: z.lazy(() => SortOrderSchema).optional(),
+  depthTop: z.lazy(() => SortOrderSchema).optional(),
+  sampleReference: z.lazy(() => SortOrderSchema).optional(),
+  sampleType: z.lazy(() => SortOrderSchema).optional(),
+  sampleUniqueID: z.lazy(() => SortOrderSchema).optional(),
+  depthBase: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSampleTaken: z.lazy(() => SortOrderSchema).optional(),
+  numBlowsRequired: z.lazy(() => SortOrderSchema).optional(),
+  sampleContainer: z.lazy(() => SortOrderSchema).optional(),
+  samplePreparation: z.lazy(() => SortOrderSchema).optional(),
+  sampleDiameter: z.lazy(() => SortOrderSchema).optional(),
+  depthToWaterBelowGroundSurface: z.lazy(() => SortOrderSchema).optional(),
+  percentageSampleRecovered: z.lazy(() => SortOrderSchema).optional(),
+  samplingTechnique: z.lazy(() => SortOrderSchema).optional(),
+  sampleMatrix: z.lazy(() => SortOrderSchema).optional(),
+  sampleQAType: z.lazy(() => SortOrderSchema).optional(),
+  samplerInitials: z.lazy(() => SortOrderSchema).optional(),
+  reasonForSampling: z.lazy(() => SortOrderSchema).optional(),
+  sampleRemarks: z.lazy(() => SortOrderSchema).optional(),
+  sampleDescription: z.lazy(() => SortOrderSchema).optional(),
+  dateSampleDescribed: z.lazy(() => SortOrderSchema).optional(),
+  personResponsibleForDescription: z.lazy(() => SortOrderSchema).optional(),
+  sampleCondition: z.lazy(() => SortOrderSchema).optional(),
+  sampleClassification: z.lazy(() => SortOrderSchema).optional(),
+  barometricPressure: z.lazy(() => SortOrderSchema).optional(),
+  sampleTemperature: z.lazy(() => SortOrderSchema).optional(),
+  gasPressureAboveBarometric: z.lazy(() => SortOrderSchema).optional(),
+  gasFlowRate: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSamplingCompleted: z.lazy(() => SortOrderSchema).optional(),
+  samplingDuration: z.lazy(() => SortOrderSchema).optional(),
+  captionUsedToDescribeSample: z.lazy(() => SortOrderSchema).optional(),
+  sampleRecordLink: z.lazy(() => SortOrderSchema).optional(),
+  stratumReference: z.lazy(() => SortOrderSchema).optional(),
+  associatedFileReference: z.lazy(() => SortOrderSchema).optional(),
+  lengthSampleRecovered: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const SampleMinOrderByAggregateInputSchema: z.ZodType<Prisma.SampleMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  locationId: z.lazy(() => SortOrderSchema).optional(),
+  depthTop: z.lazy(() => SortOrderSchema).optional(),
+  sampleReference: z.lazy(() => SortOrderSchema).optional(),
+  sampleType: z.lazy(() => SortOrderSchema).optional(),
+  sampleUniqueID: z.lazy(() => SortOrderSchema).optional(),
+  depthBase: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSampleTaken: z.lazy(() => SortOrderSchema).optional(),
+  numBlowsRequired: z.lazy(() => SortOrderSchema).optional(),
+  sampleContainer: z.lazy(() => SortOrderSchema).optional(),
+  samplePreparation: z.lazy(() => SortOrderSchema).optional(),
+  sampleDiameter: z.lazy(() => SortOrderSchema).optional(),
+  depthToWaterBelowGroundSurface: z.lazy(() => SortOrderSchema).optional(),
+  percentageSampleRecovered: z.lazy(() => SortOrderSchema).optional(),
+  samplingTechnique: z.lazy(() => SortOrderSchema).optional(),
+  sampleMatrix: z.lazy(() => SortOrderSchema).optional(),
+  sampleQAType: z.lazy(() => SortOrderSchema).optional(),
+  samplerInitials: z.lazy(() => SortOrderSchema).optional(),
+  reasonForSampling: z.lazy(() => SortOrderSchema).optional(),
+  sampleRemarks: z.lazy(() => SortOrderSchema).optional(),
+  sampleDescription: z.lazy(() => SortOrderSchema).optional(),
+  dateSampleDescribed: z.lazy(() => SortOrderSchema).optional(),
+  personResponsibleForDescription: z.lazy(() => SortOrderSchema).optional(),
+  sampleCondition: z.lazy(() => SortOrderSchema).optional(),
+  sampleClassification: z.lazy(() => SortOrderSchema).optional(),
+  barometricPressure: z.lazy(() => SortOrderSchema).optional(),
+  sampleTemperature: z.lazy(() => SortOrderSchema).optional(),
+  gasPressureAboveBarometric: z.lazy(() => SortOrderSchema).optional(),
+  gasFlowRate: z.lazy(() => SortOrderSchema).optional(),
+  dateAndTimeSamplingCompleted: z.lazy(() => SortOrderSchema).optional(),
+  samplingDuration: z.lazy(() => SortOrderSchema).optional(),
+  captionUsedToDescribeSample: z.lazy(() => SortOrderSchema).optional(),
+  sampleRecordLink: z.lazy(() => SortOrderSchema).optional(),
+  stratumReference: z.lazy(() => SortOrderSchema).optional(),
+  associatedFileReference: z.lazy(() => SortOrderSchema).optional(),
+  lengthSampleRecovered: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const SampleSumOrderByAggregateInputSchema: z.ZodType<Prisma.SampleSumOrderByAggregateInput> = z.object({
+  depthTop: z.lazy(() => SortOrderSchema).optional(),
+  depthBase: z.lazy(() => SortOrderSchema).optional(),
+  numBlowsRequired: z.lazy(() => SortOrderSchema).optional(),
+  sampleDiameter: z.lazy(() => SortOrderSchema).optional(),
+  depthToWaterBelowGroundSurface: z.lazy(() => SortOrderSchema).optional(),
+  percentageSampleRecovered: z.lazy(() => SortOrderSchema).optional(),
+  barometricPressure: z.lazy(() => SortOrderSchema).optional(),
+  sampleTemperature: z.lazy(() => SortOrderSchema).optional(),
+  gasPressureAboveBarometric: z.lazy(() => SortOrderSchema).optional(),
+  gasFlowRate: z.lazy(() => SortOrderSchema).optional(),
+  lengthSampleRecovered: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const IntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.IntNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
 }).strict();
 
 export const EnumDataTypeFilterSchema: z.ZodType<Prisma.EnumDataTypeFilter> = z.object({
@@ -2296,17 +2957,6 @@ export const EnumAgsUploadStatusFilterSchema: z.ZodType<Prisma.EnumAgsUploadStat
   in: z.union([ z.lazy(() => AgsUploadStatusSchema).array(),z.lazy(() => AgsUploadStatusSchema) ]).optional(),
   notIn: z.union([ z.lazy(() => AgsUploadStatusSchema).array(),z.lazy(() => AgsUploadStatusSchema) ]).optional(),
   not: z.union([ z.lazy(() => AgsUploadStatusSchema),z.lazy(() => NestedEnumAgsUploadStatusFilterSchema) ]).optional(),
-}).strict();
-
-export const IntNullableFilterSchema: z.ZodType<Prisma.IntNullableFilter> = z.object({
-  equals: z.number().optional().nullable(),
-  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  lt: z.number().optional(),
-  lte: z.number().optional(),
-  gt: z.number().optional(),
-  gte: z.number().optional(),
-  not: z.union([ z.number(),z.lazy(() => NestedIntNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
 export const UserProjectRelationFilterSchema: z.ZodType<Prisma.UserProjectRelationFilter> = z.object({
@@ -2371,22 +3021,6 @@ export const EnumAgsUploadStatusWithAggregatesFilterSchema: z.ZodType<Prisma.Enu
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional()
-}).strict();
-
-export const IntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.IntNullableWithAggregatesFilter> = z.object({
-  equals: z.number().optional().nullable(),
-  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  lt: z.number().optional(),
-  lte: z.number().optional(),
-  gt: z.number().optional(),
-  gte: z.number().optional(),
-  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
-  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
-  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
 }).strict();
 
 export const UserProjectCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.UserProjectCreateNestedManyWithoutUserInput> = z.object({
@@ -2649,6 +3283,20 @@ export const ProjectCreateNestedOneWithoutLocationsInputSchema: z.ZodType<Prisma
   connect: z.lazy(() => ProjectWhereUniqueInputSchema).optional()
 }).strict();
 
+export const SampleCreateNestedManyWithoutLocationInputSchema: z.ZodType<Prisma.SampleCreateNestedManyWithoutLocationInput> = z.object({
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleCreateWithoutLocationInputSchema).array(),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema),z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => SampleCreateManyLocationInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const SampleUncheckedCreateNestedManyWithoutLocationInputSchema: z.ZodType<Prisma.SampleUncheckedCreateNestedManyWithoutLocationInput> = z.object({
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleCreateWithoutLocationInputSchema).array(),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema),z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => SampleCreateManyLocationInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const NullableFloatFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableFloatFieldUpdateOperationsInput> = z.object({
   set: z.number().optional().nullable(),
   increment: z.number().optional(),
@@ -2667,6 +3315,56 @@ export const ProjectUpdateOneRequiredWithoutLocationsNestedInputSchema: z.ZodTyp
   upsert: z.lazy(() => ProjectUpsertWithoutLocationsInputSchema).optional(),
   connect: z.lazy(() => ProjectWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => ProjectUpdateWithoutLocationsInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutLocationsInputSchema) ]).optional(),
+}).strict();
+
+export const SampleUpdateManyWithoutLocationNestedInputSchema: z.ZodType<Prisma.SampleUpdateManyWithoutLocationNestedInput> = z.object({
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleCreateWithoutLocationInputSchema).array(),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema),z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => SampleUpsertWithWhereUniqueWithoutLocationInputSchema),z.lazy(() => SampleUpsertWithWhereUniqueWithoutLocationInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => SampleCreateManyLocationInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => SampleUpdateWithWhereUniqueWithoutLocationInputSchema),z.lazy(() => SampleUpdateWithWhereUniqueWithoutLocationInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => SampleUpdateManyWithWhereWithoutLocationInputSchema),z.lazy(() => SampleUpdateManyWithWhereWithoutLocationInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => SampleScalarWhereInputSchema),z.lazy(() => SampleScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const SampleUncheckedUpdateManyWithoutLocationNestedInputSchema: z.ZodType<Prisma.SampleUncheckedUpdateManyWithoutLocationNestedInput> = z.object({
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleCreateWithoutLocationInputSchema).array(),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema),z.lazy(() => SampleCreateOrConnectWithoutLocationInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => SampleUpsertWithWhereUniqueWithoutLocationInputSchema),z.lazy(() => SampleUpsertWithWhereUniqueWithoutLocationInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => SampleCreateManyLocationInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => SampleWhereUniqueInputSchema),z.lazy(() => SampleWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => SampleUpdateWithWhereUniqueWithoutLocationInputSchema),z.lazy(() => SampleUpdateWithWhereUniqueWithoutLocationInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => SampleUpdateManyWithWhereWithoutLocationInputSchema),z.lazy(() => SampleUpdateManyWithWhereWithoutLocationInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => SampleScalarWhereInputSchema),z.lazy(() => SampleScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const LocationCreateNestedOneWithoutSamplesInputSchema: z.ZodType<Prisma.LocationCreateNestedOneWithoutSamplesInput> = z.object({
+  create: z.union([ z.lazy(() => LocationCreateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedCreateWithoutSamplesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => LocationCreateOrConnectWithoutSamplesInputSchema).optional(),
+  connect: z.lazy(() => LocationWhereUniqueInputSchema).optional()
+}).strict();
+
+export const NullableIntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableIntFieldUpdateOperationsInput> = z.object({
+  set: z.number().optional().nullable(),
+  increment: z.number().optional(),
+  decrement: z.number().optional(),
+  multiply: z.number().optional(),
+  divide: z.number().optional()
+}).strict();
+
+export const LocationUpdateOneRequiredWithoutSamplesNestedInputSchema: z.ZodType<Prisma.LocationUpdateOneRequiredWithoutSamplesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => LocationCreateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedCreateWithoutSamplesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => LocationCreateOrConnectWithoutSamplesInputSchema).optional(),
+  upsert: z.lazy(() => LocationUpsertWithoutSamplesInputSchema).optional(),
+  connect: z.lazy(() => LocationWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => LocationUpdateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedUpdateWithoutSamplesInputSchema) ]).optional(),
 }).strict();
 
 export const ProjectCreateNestedOneWithoutColumnDefinitionsInputSchema: z.ZodType<Prisma.ProjectCreateNestedOneWithoutColumnDefinitionsInput> = z.object({
@@ -2695,14 +3393,6 @@ export const UserProjectCreateNestedOneWithoutAgsUploadsInputSchema: z.ZodType<P
 
 export const EnumAgsUploadStatusFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumAgsUploadStatusFieldUpdateOperationsInput> = z.object({
   set: z.lazy(() => AgsUploadStatusSchema).optional()
-}).strict();
-
-export const NullableIntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableIntFieldUpdateOperationsInput> = z.object({
-  set: z.number().optional().nullable(),
-  increment: z.number().optional(),
-  decrement: z.number().optional(),
-  multiply: z.number().optional(),
-  divide: z.number().optional()
 }).strict();
 
 export const UserProjectUpdateOneRequiredWithoutAgsUploadsNestedInputSchema: z.ZodType<Prisma.UserProjectUpdateOneRequiredWithoutAgsUploadsNestedInput> = z.object({
@@ -2907,6 +3597,22 @@ export const NestedDateTimeNullableWithAggregatesFilterSchema: z.ZodType<Prisma.
   _max: z.lazy(() => NestedDateTimeNullableFilterSchema).optional()
 }).strict();
 
+export const NestedIntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntNullableWithAggregatesFilter> = z.object({
+  equals: z.number().optional().nullable(),
+  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
+  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
+}).strict();
+
 export const NestedEnumDataTypeFilterSchema: z.ZodType<Prisma.NestedEnumDataTypeFilter> = z.object({
   equals: z.lazy(() => DataTypeSchema).optional(),
   in: z.union([ z.lazy(() => DataTypeSchema).array(),z.lazy(() => DataTypeSchema) ]).optional(),
@@ -2939,22 +3645,6 @@ export const NestedEnumAgsUploadStatusWithAggregatesFilterSchema: z.ZodType<Pris
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional(),
   _max: z.lazy(() => NestedEnumAgsUploadStatusFilterSchema).optional()
-}).strict();
-
-export const NestedIntNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntNullableWithAggregatesFilter> = z.object({
-  equals: z.number().optional().nullable(),
-  in: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  notIn: z.union([ z.number().array(),z.number() ]).optional().nullable(),
-  lt: z.number().optional(),
-  lte: z.number().optional(),
-  gt: z.number().optional(),
-  gte: z.number().optional(),
-  not: z.union([ z.number(),z.lazy(() => NestedIntNullableWithAggregatesFilterSchema) ]).optional().nullable(),
-  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _avg: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
-  _sum: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _min: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _max: z.lazy(() => NestedIntNullableFilterSchema).optional()
 }).strict();
 
 export const UserProjectCreateWithoutUserInputSchema: z.ZodType<Prisma.UserProjectCreateWithoutUserInput> = z.object({
@@ -3212,7 +3902,8 @@ export const LocationCreateWithoutProjectInputSchema: z.ZodType<Prisma.LocationC
   nationalDatum: z.string().optional().nullable(),
   originalHoleId: z.string().optional().nullable(),
   originalJobReference: z.string().optional().nullable(),
-  originatingCompany: z.string().optional().nullable()
+  originatingCompany: z.string().optional().nullable(),
+  samples: z.lazy(() => SampleCreateNestedManyWithoutLocationInputSchema).optional()
 }).strict();
 
 export const LocationUncheckedCreateWithoutProjectInputSchema: z.ZodType<Prisma.LocationUncheckedCreateWithoutProjectInput> = z.object({
@@ -3261,7 +3952,8 @@ export const LocationUncheckedCreateWithoutProjectInputSchema: z.ZodType<Prisma.
   nationalDatum: z.string().optional().nullable(),
   originalHoleId: z.string().optional().nullable(),
   originalJobReference: z.string().optional().nullable(),
-  originatingCompany: z.string().optional().nullable()
+  originatingCompany: z.string().optional().nullable(),
+  samples: z.lazy(() => SampleUncheckedCreateNestedManyWithoutLocationInputSchema).optional()
 }).strict();
 
 export const LocationCreateOrConnectWithoutProjectInputSchema: z.ZodType<Prisma.LocationCreateOrConnectWithoutProjectInput> = z.object({
@@ -3464,6 +4156,96 @@ export const ProjectCreateOrConnectWithoutLocationsInputSchema: z.ZodType<Prisma
   create: z.union([ z.lazy(() => ProjectCreateWithoutLocationsInputSchema),z.lazy(() => ProjectUncheckedCreateWithoutLocationsInputSchema) ]),
 }).strict();
 
+export const SampleCreateWithoutLocationInputSchema: z.ZodType<Prisma.SampleCreateWithoutLocationInput> = z.object({
+  id: z.string().uuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable()
+}).strict();
+
+export const SampleUncheckedCreateWithoutLocationInputSchema: z.ZodType<Prisma.SampleUncheckedCreateWithoutLocationInput> = z.object({
+  id: z.string().uuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable()
+}).strict();
+
+export const SampleCreateOrConnectWithoutLocationInputSchema: z.ZodType<Prisma.SampleCreateOrConnectWithoutLocationInput> = z.object({
+  where: z.lazy(() => SampleWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema) ]),
+}).strict();
+
+export const SampleCreateManyLocationInputEnvelopeSchema: z.ZodType<Prisma.SampleCreateManyLocationInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => SampleCreateManyLocationInputSchema),z.lazy(() => SampleCreateManyLocationInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const ProjectUpsertWithoutLocationsInputSchema: z.ZodType<Prisma.ProjectUpsertWithoutLocationsInput> = z.object({
   update: z.union([ z.lazy(() => ProjectUpdateWithoutLocationsInputSchema),z.lazy(() => ProjectUncheckedUpdateWithoutLocationsInputSchema) ]),
   create: z.union([ z.lazy(() => ProjectCreateWithoutLocationsInputSchema),z.lazy(() => ProjectUncheckedCreateWithoutLocationsInputSchema) ]),
@@ -3487,6 +4269,276 @@ export const ProjectUncheckedUpdateWithoutLocationsInputSchema: z.ZodType<Prisma
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   userProjects: z.lazy(() => UserProjectUncheckedUpdateManyWithoutProjectNestedInputSchema).optional(),
   columnDefinitions: z.lazy(() => ColumnDefinitionUncheckedUpdateManyWithoutProjectNestedInputSchema).optional()
+}).strict();
+
+export const SampleUpsertWithWhereUniqueWithoutLocationInputSchema: z.ZodType<Prisma.SampleUpsertWithWhereUniqueWithoutLocationInput> = z.object({
+  where: z.lazy(() => SampleWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => SampleUpdateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedUpdateWithoutLocationInputSchema) ]),
+  create: z.union([ z.lazy(() => SampleCreateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedCreateWithoutLocationInputSchema) ]),
+}).strict();
+
+export const SampleUpdateWithWhereUniqueWithoutLocationInputSchema: z.ZodType<Prisma.SampleUpdateWithWhereUniqueWithoutLocationInput> = z.object({
+  where: z.lazy(() => SampleWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => SampleUpdateWithoutLocationInputSchema),z.lazy(() => SampleUncheckedUpdateWithoutLocationInputSchema) ]),
+}).strict();
+
+export const SampleUpdateManyWithWhereWithoutLocationInputSchema: z.ZodType<Prisma.SampleUpdateManyWithWhereWithoutLocationInput> = z.object({
+  where: z.lazy(() => SampleScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => SampleUpdateManyMutationInputSchema),z.lazy(() => SampleUncheckedUpdateManyWithoutSamplesInputSchema) ]),
+}).strict();
+
+export const SampleScalarWhereInputSchema: z.ZodType<Prisma.SampleScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => SampleScalarWhereInputSchema),z.lazy(() => SampleScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => SampleScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => SampleScalarWhereInputSchema),z.lazy(() => SampleScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  locationId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  depthTop: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  depthBase: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleContainer: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  samplePreparation: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleDiameter: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  samplingTechnique: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleMatrix: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleQAType: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  samplerInitials: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  reasonForSampling: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleRemarks: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleDescription: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleCondition: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleClassification: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  barometricPressure: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  sampleTemperature: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  gasFlowRate: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  samplingDuration: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  stratumReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  associatedFileReference: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
+}).strict();
+
+export const LocationCreateWithoutSamplesInputSchema: z.ZodType<Prisma.LocationCreateWithoutSamplesInput> = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  customColumns: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  locationType: z.string().optional().nullable(),
+  locationStatus: z.string().optional().nullable(),
+  nationalEasting: z.number().optional().nullable(),
+  nationalNorthing: z.number().optional().nullable(),
+  gridReference: z.string().optional().nullable(),
+  groundLevel: z.number().optional().nullable(),
+  remarks: z.string().optional().nullable(),
+  finalDepth: z.number().optional().nullable(),
+  startDate: z.coerce.date().optional().nullable(),
+  purpose: z.string().optional().nullable(),
+  termination: z.string().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
+  gridReferenceLetter: z.string().optional().nullable(),
+  localGridX: z.number().optional().nullable(),
+  localGridY: z.number().optional().nullable(),
+  localDatumLevel: z.number().optional().nullable(),
+  localGridSystem: z.string().optional().nullable(),
+  localDatumSystem: z.string().optional().nullable(),
+  endOfTraverseEasting: z.number().optional().nullable(),
+  endOfTraverseNorthing: z.number().optional().nullable(),
+  endOfTraverseGroundLevel: z.number().optional().nullable(),
+  localGridEasting: z.number().optional().nullable(),
+  localGridNorthing: z.number().optional().nullable(),
+  localElevation: z.number().optional().nullable(),
+  latitudeEnd: z.string().optional().nullable(),
+  longitudeEnd: z.string().optional().nullable(),
+  projectionFormat: z.string().optional().nullable(),
+  locationMethod: z.string().optional().nullable(),
+  locationSubdivision: z.string().optional().nullable(),
+  phaseGrouping: z.string().optional().nullable(),
+  alignmentId: z.string().optional().nullable(),
+  offset: z.number().optional().nullable(),
+  chainage: z.string().optional().nullable(),
+  transformDetails: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  nationalDatum: z.string().optional().nullable(),
+  originalHoleId: z.string().optional().nullable(),
+  originalJobReference: z.string().optional().nullable(),
+  originatingCompany: z.string().optional().nullable(),
+  project: z.lazy(() => ProjectCreateNestedOneWithoutLocationsInputSchema)
+}).strict();
+
+export const LocationUncheckedCreateWithoutSamplesInputSchema: z.ZodType<Prisma.LocationUncheckedCreateWithoutSamplesInput> = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  projectId: z.string(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  customColumns: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  locationType: z.string().optional().nullable(),
+  locationStatus: z.string().optional().nullable(),
+  nationalEasting: z.number().optional().nullable(),
+  nationalNorthing: z.number().optional().nullable(),
+  gridReference: z.string().optional().nullable(),
+  groundLevel: z.number().optional().nullable(),
+  remarks: z.string().optional().nullable(),
+  finalDepth: z.number().optional().nullable(),
+  startDate: z.coerce.date().optional().nullable(),
+  purpose: z.string().optional().nullable(),
+  termination: z.string().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
+  gridReferenceLetter: z.string().optional().nullable(),
+  localGridX: z.number().optional().nullable(),
+  localGridY: z.number().optional().nullable(),
+  localDatumLevel: z.number().optional().nullable(),
+  localGridSystem: z.string().optional().nullable(),
+  localDatumSystem: z.string().optional().nullable(),
+  endOfTraverseEasting: z.number().optional().nullable(),
+  endOfTraverseNorthing: z.number().optional().nullable(),
+  endOfTraverseGroundLevel: z.number().optional().nullable(),
+  localGridEasting: z.number().optional().nullable(),
+  localGridNorthing: z.number().optional().nullable(),
+  localElevation: z.number().optional().nullable(),
+  latitudeEnd: z.string().optional().nullable(),
+  longitudeEnd: z.string().optional().nullable(),
+  projectionFormat: z.string().optional().nullable(),
+  locationMethod: z.string().optional().nullable(),
+  locationSubdivision: z.string().optional().nullable(),
+  phaseGrouping: z.string().optional().nullable(),
+  alignmentId: z.string().optional().nullable(),
+  offset: z.number().optional().nullable(),
+  chainage: z.string().optional().nullable(),
+  transformDetails: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  nationalDatum: z.string().optional().nullable(),
+  originalHoleId: z.string().optional().nullable(),
+  originalJobReference: z.string().optional().nullable(),
+  originatingCompany: z.string().optional().nullable()
+}).strict();
+
+export const LocationCreateOrConnectWithoutSamplesInputSchema: z.ZodType<Prisma.LocationCreateOrConnectWithoutSamplesInput> = z.object({
+  where: z.lazy(() => LocationWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => LocationCreateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedCreateWithoutSamplesInputSchema) ]),
+}).strict();
+
+export const LocationUpsertWithoutSamplesInputSchema: z.ZodType<Prisma.LocationUpsertWithoutSamplesInput> = z.object({
+  update: z.union([ z.lazy(() => LocationUpdateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedUpdateWithoutSamplesInputSchema) ]),
+  create: z.union([ z.lazy(() => LocationCreateWithoutSamplesInputSchema),z.lazy(() => LocationUncheckedCreateWithoutSamplesInputSchema) ]),
+}).strict();
+
+export const LocationUpdateWithoutSamplesInputSchema: z.ZodType<Prisma.LocationUpdateWithoutSamplesInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  customColumns: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  locationType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationStatus: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gridReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  groundLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  remarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  finalDepth: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  purpose: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  termination: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gridReferenceLetter: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridX: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridY: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localDatumLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridSystem: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localDatumSystem: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseGroundLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localElevation: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  latitudeEnd: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitudeEnd: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  projectionFormat: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationMethod: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationSubdivision: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  phaseGrouping: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  alignmentId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  offset: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  chainage: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  transformDetails: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalDatum: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  project: z.lazy(() => ProjectUpdateOneRequiredWithoutLocationsNestedInputSchema).optional()
+}).strict();
+
+export const LocationUncheckedUpdateWithoutSamplesInputSchema: z.ZodType<Prisma.LocationUncheckedUpdateWithoutSamplesInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  projectId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  customColumns: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValue ]).optional(),
+  locationType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationStatus: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gridReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  groundLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  remarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  finalDepth: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  purpose: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  termination: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gridReferenceLetter: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridX: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridY: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localDatumLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridSystem: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localDatumSystem: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  endOfTraverseGroundLevel: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridEasting: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localGridNorthing: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  localElevation: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  latitudeEnd: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  longitudeEnd: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  projectionFormat: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationMethod: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  locationSubdivision: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  phaseGrouping: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  alignmentId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  offset: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  chainage: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  transformDetails: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  nationalDatum: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ProjectCreateWithoutColumnDefinitionsInputSchema: z.ZodType<Prisma.ProjectCreateWithoutColumnDefinitionsInput> = z.object({
@@ -3766,6 +4818,7 @@ export const LocationUpdateWithoutProjectInputSchema: z.ZodType<Prisma.LocationU
   originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samples: z.lazy(() => SampleUpdateManyWithoutLocationNestedInputSchema).optional()
 }).strict();
 
 export const LocationUncheckedUpdateWithoutProjectInputSchema: z.ZodType<Prisma.LocationUncheckedUpdateWithoutProjectInput> = z.object({
@@ -3815,6 +4868,7 @@ export const LocationUncheckedUpdateWithoutProjectInputSchema: z.ZodType<Prisma.
   originalHoleId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originalJobReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   originatingCompany: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samples: z.lazy(() => SampleUncheckedUpdateManyWithoutLocationNestedInputSchema).optional()
 }).strict();
 
 export const LocationUncheckedUpdateManyWithoutLocationsInputSchema: z.ZodType<Prisma.LocationUncheckedUpdateManyWithoutLocationsInput> = z.object({
@@ -3904,6 +4958,166 @@ export const ColumnDefinitionUncheckedUpdateManyWithoutColumnDefinitionsInputSch
   tableId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   label: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   dataType: z.union([ z.lazy(() => DataTypeSchema),z.lazy(() => EnumDataTypeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SampleCreateManyLocationInputSchema: z.ZodType<Prisma.SampleCreateManyLocationInput> = z.object({
+  id: z.string().uuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  depthTop: z.number().optional().nullable(),
+  sampleReference: z.string().optional().nullable(),
+  sampleType: z.string().optional().nullable(),
+  sampleUniqueID: z.string().optional().nullable(),
+  depthBase: z.number().optional().nullable(),
+  dateAndTimeSampleTaken: z.coerce.date().optional().nullable(),
+  numBlowsRequired: z.number().int().optional().nullable(),
+  sampleContainer: z.string().optional().nullable(),
+  samplePreparation: z.string().optional().nullable(),
+  sampleDiameter: z.number().optional().nullable(),
+  depthToWaterBelowGroundSurface: z.number().optional().nullable(),
+  percentageSampleRecovered: z.number().optional().nullable(),
+  samplingTechnique: z.string().optional().nullable(),
+  sampleMatrix: z.string().optional().nullable(),
+  sampleQAType: z.string().optional().nullable(),
+  samplerInitials: z.string().optional().nullable(),
+  reasonForSampling: z.string().optional().nullable(),
+  sampleRemarks: z.string().optional().nullable(),
+  sampleDescription: z.string().optional().nullable(),
+  dateSampleDescribed: z.coerce.date().optional().nullable(),
+  personResponsibleForDescription: z.string().optional().nullable(),
+  sampleCondition: z.string().optional().nullable(),
+  sampleClassification: z.string().optional().nullable(),
+  barometricPressure: z.number().optional().nullable(),
+  sampleTemperature: z.number().optional().nullable(),
+  gasPressureAboveBarometric: z.number().optional().nullable(),
+  gasFlowRate: z.number().optional().nullable(),
+  dateAndTimeSamplingCompleted: z.coerce.date().optional().nullable(),
+  samplingDuration: z.string().optional().nullable(),
+  captionUsedToDescribeSample: z.string().optional().nullable(),
+  sampleRecordLink: z.string().optional().nullable(),
+  stratumReference: z.string().optional().nullable(),
+  associatedFileReference: z.string().optional().nullable(),
+  lengthSampleRecovered: z.number().optional().nullable()
+}).strict();
+
+export const SampleUpdateWithoutLocationInputSchema: z.ZodType<Prisma.SampleUpdateWithoutLocationInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const SampleUncheckedUpdateWithoutLocationInputSchema: z.ZodType<Prisma.SampleUncheckedUpdateWithoutLocationInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const SampleUncheckedUpdateManyWithoutSamplesInputSchema: z.ZodType<Prisma.SampleUncheckedUpdateManyWithoutSamplesInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  depthTop: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleUniqueID: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthBase: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSampleTaken: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  numBlowsRequired: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleContainer: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplePreparation: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDiameter: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  depthToWaterBelowGroundSurface: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  percentageSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingTechnique: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleMatrix: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleQAType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplerInitials: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  reasonForSampling: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRemarks: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateSampleDescribed: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  personResponsibleForDescription: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleCondition: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleClassification: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  barometricPressure: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleTemperature: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasPressureAboveBarometric: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gasFlowRate: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  dateAndTimeSamplingCompleted: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  samplingDuration: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  captionUsedToDescribeSample: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  sampleRecordLink: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stratumReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  associatedFileReference: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  lengthSampleRecovered: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 /////////////////////////////////////////
@@ -4160,6 +5374,7 @@ export const LocationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.LocationFindU
 
 export const SampleFindFirstArgsSchema: z.ZodType<Prisma.SampleFindFirstArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereInputSchema.optional(),
   orderBy: z.union([ SampleOrderByWithRelationInputSchema.array(),SampleOrderByWithRelationInputSchema ]).optional(),
   cursor: SampleWhereUniqueInputSchema.optional(),
@@ -4170,6 +5385,7 @@ export const SampleFindFirstArgsSchema: z.ZodType<Prisma.SampleFindFirstArgs> = 
 
 export const SampleFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SampleFindFirstOrThrowArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereInputSchema.optional(),
   orderBy: z.union([ SampleOrderByWithRelationInputSchema.array(),SampleOrderByWithRelationInputSchema ]).optional(),
   cursor: SampleWhereUniqueInputSchema.optional(),
@@ -4180,6 +5396,7 @@ export const SampleFindFirstOrThrowArgsSchema: z.ZodType<Prisma.SampleFindFirstO
 
 export const SampleFindManyArgsSchema: z.ZodType<Prisma.SampleFindManyArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereInputSchema.optional(),
   orderBy: z.union([ SampleOrderByWithRelationInputSchema.array(),SampleOrderByWithRelationInputSchema ]).optional(),
   cursor: SampleWhereUniqueInputSchema.optional(),
@@ -4207,11 +5424,13 @@ export const SampleGroupByArgsSchema: z.ZodType<Prisma.SampleGroupByArgs> = z.ob
 
 export const SampleFindUniqueArgsSchema: z.ZodType<Prisma.SampleFindUniqueArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereUniqueInputSchema,
 }).strict()
 
 export const SampleFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.SampleFindUniqueOrThrowArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereUniqueInputSchema,
 }).strict()
 
@@ -4505,11 +5724,13 @@ export const LocationDeleteManyArgsSchema: z.ZodType<Prisma.LocationDeleteManyAr
 
 export const SampleCreateArgsSchema: z.ZodType<Prisma.SampleCreateArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   data: z.union([ SampleCreateInputSchema,SampleUncheckedCreateInputSchema ]),
 }).strict()
 
 export const SampleUpsertArgsSchema: z.ZodType<Prisma.SampleUpsertArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereUniqueInputSchema,
   create: z.union([ SampleCreateInputSchema,SampleUncheckedCreateInputSchema ]),
   update: z.union([ SampleUpdateInputSchema,SampleUncheckedUpdateInputSchema ]),
@@ -4522,11 +5743,13 @@ export const SampleCreateManyArgsSchema: z.ZodType<Prisma.SampleCreateManyArgs> 
 
 export const SampleDeleteArgsSchema: z.ZodType<Prisma.SampleDeleteArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   where: SampleWhereUniqueInputSchema,
 }).strict()
 
 export const SampleUpdateArgsSchema: z.ZodType<Prisma.SampleUpdateArgs> = z.object({
   select: SampleSelectSchema.optional(),
+  include: SampleIncludeSchema.optional(),
   data: z.union([ SampleUpdateInputSchema,SampleUncheckedUpdateInputSchema ]),
   where: SampleWhereUniqueInputSchema,
 }).strict()

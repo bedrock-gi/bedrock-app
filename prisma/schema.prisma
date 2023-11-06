@@ -22,7 +22,7 @@ model User {
 }
 
 model UserProject {
-  role       Role
+  role       Role?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -32,6 +32,16 @@ model UserProject {
   agsUploads AgsUpload[]
 
   @@id([userId, projectId])
+  @@unique([userId, projectId, role])
+}
+
+model Location2 {
+  locationId String
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id])
+
+  @@id([locationId, projectId])
+  @@unique([locationId, projectId])
 }
 
 model Project {
@@ -47,6 +57,7 @@ model Project {
   userProjects UserProject[]
 
   columnDefinitions ColumnDefinition[]
+  Location2         Location2[]
 }
 
 enum Role {
@@ -107,12 +118,50 @@ model Location {
   originalHoleId          String? // Text
   originalJobReference    String? // Text
   originatingCompany      String? // Text
+  samples                 Sample[]
 }
 
 model Sample {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid()) // Unique Identifier
+  createdAt  DateTime @default(now()) // Date time in international format
+  updatedAt  DateTime @updatedAt // Date time in international format
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String // Unique Identifier
+
+  depthTop                        Float? // m 2DP Depth to top of sample
+  sampleReference                 String? // Sample reference
+  sampleType                      String? // PA Sample type
+  sampleUniqueID                  String? // ID Sample unique identifier
+  depthBase                       Float? // m 2DP Depth to base of sample
+  dateAndTimeSampleTaken          DateTime? // Date and time sample taken
+  numBlowsRequired                Int? // 0DP Number of blows required to drive sampler
+  sampleContainer                 String? // Sample container
+  samplePreparation               String? // Details of sample preparation at the time of sampling
+  sampleDiameter                  Float? // mm 0DP Sample diameter
+  depthToWaterBelowGroundSurface  Float? // m 2DP Depth to water below ground surface at the time of sampling
+  percentageSampleRecovered       Float? // % 0DP Percentage of sample recovered
+  samplingTechnique               String? // X Sample QA type (Normal, blank, or spike)
+  sampleMatrix                    String? // Sample matrix
+  sampleQAType                    String? // Sample QA type (Normal, blank, or spike)
+  samplerInitials                 String? // Samplers initials or name
+  reasonForSampling               String? // Reason for sampling
+  sampleRemarks                   String? // Sample remarks
+  sampleDescription               String? // Sample/specimen description
+  dateSampleDescribed             DateTime? // Date sample described
+  personResponsibleForDescription String? // Person responsible for sample/specimen description
+  sampleCondition                 String? // Condition and representativeness of sample
+  sampleClassification            String? // Sample classification as required by EN ISO 14688-1
+  barometricPressure              Float? // bar 1DP Barometric pressure at the time of sampling
+  sampleTemperature               Float? // DegC 0DP Sample temperature at the time of sampling
+  gasPressureAboveBarometric      Float? // bar 1DP Gas pressure (above barometric)
+  gasFlowRate                     Float? // l/min 1DP Gas flow rate
+  dateAndTimeSamplingCompleted    DateTime? // Date and time sampling completed
+  samplingDuration                String? // T Sampling duration
+  captionUsedToDescribeSample     String? // Caption used to describe sample
+  sampleRecordLink                String? // RL Sample record link
+  stratumReference                String? // X Stratum reference shown on trial pit or traverse sketch
+  associatedFileReference         String? // X Associated file reference (e.g. sampling field sheets, sample description records)
+  lengthSampleRecovered           Float? // mm 0DP Length of sample recovered
 }
 
 model ColumnDefinition {
