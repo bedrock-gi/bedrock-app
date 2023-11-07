@@ -32,16 +32,6 @@ model UserProject {
   agsUploads AgsUpload[]
 
   @@id([userId, projectId])
-  @@unique([userId, projectId, role])
-}
-
-model Location2 {
-  locationId String
-  projectId  String
-  project    Project @relation(fields: [projectId], references: [id])
-
-  @@id([locationId, projectId])
-  @@unique([locationId, projectId])
 }
 
 model Project {
@@ -57,7 +47,6 @@ model Project {
   userProjects UserProject[]
 
   columnDefinitions ColumnDefinition[]
-  Location2         Location2[]
 }
 
 enum Role {
@@ -119,6 +108,8 @@ model Location {
   originalJobReference    String? // Text
   originatingCompany      String? // Text
   samples                 Sample[]
+
+  @@unique([name, projectId])
 }
 
 model Sample {
@@ -162,6 +153,8 @@ model Sample {
   stratumReference                String? // X Stratum reference shown on trial pit or traverse sketch
   associatedFileReference         String? // X Associated file reference (e.g. sampling field sheets, sample description records)
   lengthSampleRecovered           Float? // mm 0DP Length of sample recovered
+
+  @@unique([locationId, sampleUniqueID, sampleType, depthTop, sampleReference])
 }
 
 model ColumnDefinition {

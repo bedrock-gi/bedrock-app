@@ -1,4 +1,3 @@
-import { prisma } from "~/db.server";
 import type { ZodPrismaType } from "../models/ags/zod";
 
 export type ObjectWithStringKeys = {
@@ -15,10 +14,7 @@ type AgsUploadRecords<T extends ObjectWithStringKeys> = {
   updatedRecords: T[];
 };
 
-export type AgsMapping<
-  T extends ObjectWithStringKeys,
-  K extends Partial<DataColumns<T>>
-> = {
+export type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
 
@@ -38,5 +34,3 @@ export type AgsMapping<
     [agsColumnName: string]: keyof DataColumns<T>;
   };
 };
-
-export const TABLES = [prisma.location, prisma.sample];

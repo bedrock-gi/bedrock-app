@@ -1,5 +1,5 @@
 import { prisma } from "~/db.server";
-import type AgsMapping from "../../../types/agsMapping";
+import type { AgsMapping } from "../../../types/agsMapping";
 import { prepareAgsZodSchema } from "../zod";
 import type { Location } from "@prisma/client";
 
