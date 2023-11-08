@@ -1,18 +1,23 @@
 import { prisma } from "~/db.server";
-import type { AgsMapping } from "../../../types/agsMapping";
+import { AgsMapping } from "../../../types/agsMappingConfig";
 import { prepareAgsZodSchema } from "../zod";
-import type { Location } from "@prisma/client";
+import type { Location, Project } from "@prisma/client";
 
 import {
   LocationSchema,
   LocationCreateManyArgsSchema,
 } from "prisma/generated/zod";
+import type { DataColumns } from "~/types/agsMapping";
 
-export const locationMapping: AgsMapping<Location> = {
-  agsTableName: "LOCA",
-  prismaLabel: "location",
-
-  createRecords: async (records, projectId) => {
+export class LocationMapping extends AgsMapping<
+  Location,
+  Project,
+  {
+    projectId: string;
+  },
+  {}
+> {
+  async createRecords(records: DataColumns<Location>[], projectId: string) {
     const recordsWithProjectId = records.map((record) => ({
       ...record,
       projectId,
@@ -23,8 +28,9 @@ export const locationMapping: AgsMapping<Location> = {
     });
 
     await prisma.location.createMany(input);
-  },
-  updateRecords: async (records) => {
+  }
+
+  async updateRecords(records: Location[]) {
     records.forEach(async (record) => {
       const location = LocationSchema.parse(record);
 
@@ -35,9 +41,12 @@ export const locationMapping: AgsMapping<Location> = {
         data: location,
       });
     });
-  },
+  }
 
-  findExistingRecords: async (records, projectId) => {
+  async findExistingRecords(
+    records: DataColumns<Location>[],
+    projectId: string
+  ) {
     const existingRecords = await prisma.location.findMany({
       where: {
         projectId,
@@ -58,9 +67,16 @@ export const locationMapping: AgsMapping<Location> = {
       newRecords,
       updatedRecords: existingRecords,
     };
-  },
+  }
+}
 
-  columns: {
+export const locationMapping = new LocationMapping(
+  prepareAgsZodSchema(LocationSchema).omit({
+    projectId: true,
+  }),
+  "LOCA",
+  "location",
+  {
     LOCA_ID: "name",
     LOCA_LAT: "latitude",
     LOCA_LON: "longitude",
@@ -105,7 +121,5 @@ export const locationMapping: AgsMapping<Location> = {
     LOCA_ORJO: "originalJobReference",
     LOCA_ORCO: "originatingCompany",
   },
-  zodSchema: prepareAgsZodSchema(LocationSchema).omit({
-    projectId: true,
-  }),
-};
+  ["name"] as unknown as keyof DataColumns<Location>[]
+);

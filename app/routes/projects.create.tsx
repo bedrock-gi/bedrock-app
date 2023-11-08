@@ -13,8 +13,6 @@ export const action = (async ({ request }) => {
   const projectName = formData.get("projectName") as string;
   const description = formData.get("description") as string;
 
-  console.log("user", user);
-
   await createProject(user.id, projectName, description);
 
   return redirect(`/projects`);

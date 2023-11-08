@@ -14,9 +14,20 @@ type AgsUploadRecords<T extends ObjectWithStringKeys> = {
   updatedRecords: T[];
 };
 
+export type DataColumns<T extends ObjectWithStringKeys> = Omit<
+  T,
+  "createdAt" | "updatedAt" | "id" | "customColumns"
+>;
+
+type AgsUploadRecords<T extends ObjectWithStringKeys> = {
+  newRecords: DataColumns<T>[];
+  updatedRecords: T[];
+};
+
 export type AgsMapping<T extends ObjectWithStringKeys> = {
   agsTableName: string;
   prismaLabel: string;
+  parent?: AgsMapping<ObjectWithStringKeys>;
 
   createRecords: (
     records: DataColumns<T>[],
@@ -29,7 +40,7 @@ export type AgsMapping<T extends ObjectWithStringKeys> = {
     parentId: string
   ) => Promise<AgsUploadRecords<T>>;
 
-  zodSchema: ZodPrismaType;
+  zodSchema: ZodPrismaType<ObjectWithStringKeys>;
   columns: {
     [agsColumnName: string]: keyof DataColumns<T>;
   };

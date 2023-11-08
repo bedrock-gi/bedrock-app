@@ -1,25 +1,31 @@
-import { Sample, Location } from "@prisma/client";
+import type { Location, Sample } from "@prisma/client";
+
 import { SampleSchema } from "prisma/generated/zod";
 import { z } from "zod";
 import { prisma } from "~/db.server";
-import { AgsMapping } from "~/types/agsMapping";
+import type { DataColumns } from "~/types/agsMappingConfig";
+import { AgsMapping } from "~/types/agsMappingConfig";
+import { prepareAgsZodSchema } from "../zod";
 
 // TODO: finish basic method of checking if sample exists by continuing below method.
 // after this is done, do the same thing with a child of SAMP table.
 // Then, see if a class based method could be used to reduce code repetition.
 
-export const sampleMapping: AgsMapping<
-  Sample & {
-    locationName: string;
+class SampleMapping extends AgsMapping<
+  Sample,
+  Location,
+  {
+    locationId: string;
+  },
+  {
+    name: string;
   }
-> = {
-  agsTableName: "SAMP",
-  prismaLabel: "sample",
-  zodSchema: SampleSchema.omit({ locationId: true }).extend({
-    locationName: z.string(),
-  }),
+> {
+  async findExistingRecords(
+    records: (Sample & { locationName: string })[],
 
-  async findExistingRecords(records, projectId) {
+    projectId: string
+  ) {
     const existingRecords = await prisma.sample.findMany({
       where: {
         OR: records.map(
@@ -44,27 +50,94 @@ export const sampleMapping: AgsMapping<
         ),
       },
 
-      select: {
-        depthTop: true,
-        sampleType: true,
-        sampleReference: true,
-        sampleUniqueID: true,
+      include: {
         location: true,
       },
     });
 
-    const recordsForCompareDb = new Set(
-      existingRecords.map(({ location, ...rec }) => {
-        return {
-          ...rec,
-          locationName: location.name,
-        };
+    // find the new records, by comparing the existing records to the records
+    // that were passed in.
+    const newRecords = records.filter((record) => {
+      return !existingRecords.some(
+        (existingRecord) =>
+          existingRecord.depthTop === record.depthTop &&
+          existingRecord.sampleType === record.sampleType &&
+          existingRecord.sampleReference === record.sampleReference &&
+          existingRecord.sampleUniqueID === record.sampleUniqueID &&
+          existingRecord.location.name === record.locationName
+      );
+    });
+
+    return {
+      newRecords: newRecords,
+      updatedRecords: existingRecords.map(({ location, ...rest }) => ({
+        ...rest,
+        locationName: location.name,
+        locationId: location.id,
+      })),
+    };
+  }
+
+  async createRecords(records: any[], projectId: string) {
+    const recordsParsed = records.map((record) => this.zodSchema.parse(record));
+
+    const uniqueLocations = [
+      ...new Set(recordsParsed.map((record) => record.name)),
+    ];
+
+    const locations = await prisma.location.findMany({
+      where: {
+        projectId,
+        name: {
+          in: uniqueLocations,
+        },
+      },
+    });
+
+    const locationsByName = Object.fromEntries(
+      locations.map((location) => [location.name, location])
+    );
+
+    const recordsWithLocationId: DataColumns<Sample>[] = recordsParsed.map(
+      ({ name, ...record }) => ({
+        ...record,
+        locationId: locationsByName[name].id,
       })
     );
-  },
 
-  columns: {
-    LOCA_ID: "locationName", // X Location reference,
+    await prisma.sample.createMany({
+      data: recordsWithLocationId,
+    });
+  }
+
+  async updateRecords(records: Sample[]) {
+    const recordsParsed = records.map((record) => SampleSchema.parse(record));
+
+    await Promise.all(
+      recordsParsed.map(async (record) => {
+        await prisma.sample.update({
+          where: {
+            id: record.id,
+          },
+          data: record,
+        });
+      })
+    );
+  }
+}
+
+export const sampleMapping = new SampleMapping(
+  prepareAgsZodSchema(SampleSchema)
+    .omit({
+      locationId: true,
+    })
+    .extend({
+      name: z.string(),
+    }),
+  "SAMP",
+  "sample",
+  {
+    LOCA_ID: "name", // X Location reference,
     SAMP_TOP: "depthTop", // m 2DP Depth to top of sample
     SAMP_REF: "sampleReference", // X Sample reference
     SAMP_TYPE: "sampleType", // PA Sample type
@@ -100,4 +173,11 @@ export const sampleMapping: AgsMapping<
     FILE_FSET: "associatedFileReference", // X Associated file reference (e.g. sampling field sheets, sample description records)
     SAMP_RECL: "lengthSampleRecovered", // mm 0DP Length of sample recovered
   },
-};
+  [
+    "depthTop",
+    "sampleType",
+    "sampleReference",
+    "sampleUniqueID",
+    "locationId",
+  ] as unknown as keyof Sample[]
+);

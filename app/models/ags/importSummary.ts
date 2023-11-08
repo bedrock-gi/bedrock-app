@@ -1,7 +1,6 @@
 import { Ags } from "./models";
-import { mappings } from "./mappings";
-
-import type AgsMapping from "../../types/agsMapping";
+import type { AgsMappingAny, TableMapping } from "./mappings";
+import { mappings, mappingsHierarchy } from "./mappings";
 
 import { parseAgsGroup } from "./parse";
 import type { ObjectWithStringKeys } from "../../types/agsMapping";
@@ -11,13 +10,13 @@ import type { AgsUpload } from "@prisma/client";
 type AgsUploadSummary = {
   numNewRecords: number;
   numUpdatedRecords: number;
-  mapping: AgsMapping<any>;
+  mapping: AgsMappingAny;
 };
 
 type AgsUploadSummaryBlob = {
   newRecords: ObjectWithStringKeys[];
   updatedRecords: ObjectWithStringKeys[];
-  mappingKey: keyof typeof mappings;
+  mappingKey: string;
 };
 
 function saveRecordsToBlob(uploadId: string, records: AgsUploadSummaryBlob[]) {
@@ -33,37 +32,58 @@ export async function createAgsImportSummary(
 ) {
   const ags = new Ags(inputFile);
 
-  const agsGroups = Object.entries(mappings).map(async ([key, mapping]) => {
-    const agsGroup = ags.agsData[mapping.agsTableName];
-    const records = parseAgsGroup(agsGroup, mapping);
-    const { newRecords, updatedRecords } = await mapping.findExistingRecords(
-      // @ts-ignore We can ignore as we have already parsed and validated with zod
-      records.parsedRecords,
-      projectId
-    );
+  const groups: AgsUploadSummaryBlob[] = [];
 
-    return {
+  const stack = [mappingsHierarchy];
+
+  while (stack.length > 0) {
+    const currentMapping = stack.pop();
+    if (!currentMapping) {
+      throw new Error("No current mapping");
+    }
+    const agsGroup = ags.agsData[currentMapping.mapping.agsTableName];
+
+    console.log("parsing", currentMapping.mapping.agsTableName);
+    const records = parseAgsGroup(agsGroup, currentMapping.mapping);
+    console.log("parsed", currentMapping.mapping.agsTableName);
+    console.log(records.parsedRecords[0]);
+
+    const { newRecords, updatedRecords } =
+      await currentMapping.mapping.findExistingRecords(
+        records.parsedRecords,
+        projectId
+      );
+
+    const summary = {
       newRecords,
       updatedRecords,
-      mapping,
-      key,
+      mappingKey: currentMapping.mapping.prismaLabel,
+      mapping: currentMapping.mapping,
     };
-  });
 
-  const groups = await Promise.all(agsGroups);
+    console.log("adding summary", summary.mappingKey);
+    groups.push(summary);
+
+    if (currentMapping.children) {
+      stack.push(...currentMapping.children);
+    }
+  }
+
+  console.log("groups", groups);
+  console.log("groups", groups);
 
   saveRecordsToBlob(
     uploadId,
     groups.map((group) => ({
       newRecords: group.newRecords,
       updatedRecords: group.updatedRecords,
-      mappingKey: group.key as keyof typeof mappings,
+      mappingKey: group.mappingKey,
     }))
   );
 
   const agsUploadSummary: AgsUploadSummary[] = groups.map((group) => {
     return {
-      mapping: group.mapping,
+      mapping: mappings[group.mappingKey as keyof typeof mappings],
       numNewRecords: group.newRecords.length,
       numUpdatedRecords: group.updatedRecords.length,
     };
@@ -75,14 +95,30 @@ export async function createAgsImportSummary(
 export async function uploadToPrismaFromBlob(upload: AgsUpload) {
   const blob = readFileSync(`./uploads/${upload.id}.json`, "utf-8");
   const agsUpload: AgsUploadSummaryBlob[] = JSON.parse(blob);
-  console.log(agsUpload);
 
-  agsUpload.forEach(async (group) => {
-    const mapping = mappings[group.mappingKey];
+  console.log("starting upload");
 
-    // @ts-ignore We can ignore as we have already parsed and validated with zod
-    await mapping.createRecords(group.newRecords, upload.projectId);
-    // @ts-ignore We can ignore as we have already parsed and validated with zod
-    await mapping.updateRecords(group.updatedRecords);
-  });
+  async function uploadToPrisma(tableMapping: TableMapping) {
+    console.log(`uploading ${tableMapping.mapping.prismaLabel}`);
+    const agsUploadGroup = agsUpload.find(
+      (group) => group.mappingKey === tableMapping.mapping.prismaLabel
+    );
+
+    if (agsUploadGroup) {
+      await tableMapping.mapping.createRecords(
+        agsUploadGroup.newRecords,
+        upload.projectId
+      );
+
+      await tableMapping.mapping.updateRecords(agsUploadGroup.updatedRecords);
+    }
+
+    if (tableMapping.children) {
+      tableMapping.children.forEach(async (child) => {
+        await uploadToPrisma(child);
+      });
+    }
+  }
+
+  await uploadToPrisma(mappingsHierarchy);
 }

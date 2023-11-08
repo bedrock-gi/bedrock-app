@@ -17,8 +17,6 @@ import invariant from "tiny-invariant";
 export const loader = async ({ params, request }: LoaderArgs) => {
   invariant(params.projectId);
 
-  //   console.log("request", request);
-
   const role = await requireUserProjectRole(request, params.projectId);
   invariant(role);
 
