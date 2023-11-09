@@ -22,29 +22,37 @@ class SampleMapping extends AgsMapping<
   }
 > {
   async findExistingRecords(
-    records: (Sample & { locationName: string })[],
+    records: (Sample & { name: string })[],
 
     projectId: string
   ) {
     const existingRecords = await prisma.sample.findMany({
       where: {
         OR: records.map(
-          ({
-            depthTop,
-            locationName,
-            sampleType,
-            sampleUniqueID,
-            sampleReference,
-          }) => {
+          ({ depthTop, name, sampleType, sampleUniqueID, sampleReference }) => {
             return {
-              depthTop,
-              location: {
-                name: locationName,
-                projectId,
+              AND: {
+                depthTop: {
+                  equals: depthTop,
+                },
+                location: {
+                  name: {
+                    equals: name,
+                  },
+                  projectId: {
+                    equals: projectId,
+                  },
+                },
+                sampleType: {
+                  equals: sampleType,
+                },
+                sampleReference: {
+                  equals: sampleReference,
+                },
+                sampleUniqueID: {
+                  equals: sampleUniqueID,
+                },
               },
-              sampleType,
-              sampleReference,
-              sampleUniqueID,
             };
           }
         ),
@@ -55,6 +63,8 @@ class SampleMapping extends AgsMapping<
       },
     });
 
+    console.log("existingRecords", existingRecords);
+
     // find the new records, by comparing the existing records to the records
     // that were passed in.
     const newRecords = records.filter((record) => {
@@ -64,7 +74,7 @@ class SampleMapping extends AgsMapping<
           existingRecord.sampleType === record.sampleType &&
           existingRecord.sampleReference === record.sampleReference &&
           existingRecord.sampleUniqueID === record.sampleUniqueID &&
-          existingRecord.location.name === record.locationName
+          existingRecord.location.name === record.name
       );
     });
 
