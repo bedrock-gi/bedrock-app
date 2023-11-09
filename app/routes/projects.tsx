@@ -1,8 +1,7 @@
-import { LoaderFunction, json, redirect } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { getProjects } from "~/models/projects";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, Outlet } from "@remix-run/react";
 import { requireUser } from "~/utils/auth.server";
-import { useMatches } from "@remix-run/react";
 
 export const loader = (async ({ request }) => {
   const user = await requireUser(request);

@@ -1,4 +1,4 @@
-import type { LoaderArgs, ActionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import {
   unstable_composeUploadHandlers,
   unstable_createMemoryUploadHandler,
@@ -12,7 +12,7 @@ import { createWriteStream } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { createAgsUpload } from "~/models/agsUploads";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }
@@ -28,7 +28,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return typedjson({ role });
 };
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }

@@ -1,5 +1,5 @@
 // app/routes/auth/logout.ts
-import type { ActionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 
 import { redirect } from "@remix-run/node";
 
@@ -7,7 +7,7 @@ import { sessionStorage } from "~/services/session.server";
 
 const { AUTH0_LOGOUT_URL, AUTH0_CLIENT_ID, AUTH0_RETURN_TO_URL } = process.env;
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );

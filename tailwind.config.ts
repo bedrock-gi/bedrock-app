@@ -11,23 +11,23 @@ export default {
     themes: [
       {
         bedrock: {
-          primary: "#a16207",
+          primary: "#9d4e15",
 
-          secondary: "#d9f99d",
+          secondary: "#276e0f",
 
-          accent: "#60a5fa",
+          accent: "#4c159d",
 
-          neutral: "#1d1320",
+          neutral: "#261726",
 
-          "base-100": "#ffffff",
+          "base-100": "#FFFFFF",
 
-          info: "#a9daea",
+          info: "#4f66c9",
 
-          success: "#22c55e",
+          success: "#169886",
 
-          warning: "#fbbf24",
+          warning: "#f7d955",
 
-          error: "#f52e3b",
+          error: "#e94e72",
         },
       },
     ],

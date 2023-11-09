@@ -1,11 +1,11 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 import { readFileSync } from "fs";
 import { loadAgsToPrisma } from "~/models/ags/prisma";
 import { getAgsUpload } from "~/models/agsUploads";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!params.projectId) {
     return redirect("/projects");
   }
