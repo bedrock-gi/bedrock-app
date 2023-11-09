@@ -1,16 +1,14 @@
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   cacheDirectory: "./node_modules/.cache/remix",
-  future: {
-    v2_dev: true,
-    v2_errorBoundary: true,
-    v2_headers: true,
-    v2_meta: true,
-    v2_normalizeFormMethod: true,
-    v2_routeConvention: true,
-  },
   ignoredRouteFiles: ["**/.*", "**/*.test.{js,jsx,ts,tsx}"],
   postcss: true,
-  serverModuleFormat: "cjs",
+  serverBuildPath: "./build/index.js",
   tailwind: true,
+  publicPath: "/build/", // default value, can be removed
+  serverMainFields: ["main", "module"], // default value, can be removed
+  serverMinify: false, // default value, can be removed
+  serverModuleFormat: "cjs", // default value in 1.x, add before upgrading
+  serverPlatform: "node", // default value, can be removed
+  
 };
