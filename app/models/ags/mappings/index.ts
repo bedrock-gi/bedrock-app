@@ -1,3 +1,27 @@
-import { locationMapping } from "./locations";
+import type { AgsMapping } from "../../../types/agsMappingConfig";
+import { locationMapping } from "./location";
+import { sampleMapping } from "./sample";
 
-export const mappings = [locationMapping];
+export type AgsMappingAny = AgsMapping<any, any, any, any>;
+
+export type TableMapping = {
+  mapping: AgsMappingAny;
+  children: TableMapping[];
+};
+
+export const mappingsHierarchy: TableMapping = {
+  mapping: locationMapping,
+  children: [
+    {
+      mapping: sampleMapping,
+      children: [],
+    },
+  ],
+};
+
+export const mappings = {
+  location: locationMapping,
+  sample: sampleMapping,
+};
+
+export type PrismaTable = "location" | "sample";

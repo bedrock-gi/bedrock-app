@@ -1,9 +1,9 @@
 import type { ActionFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { createProject } from "~/models/projects";
 import { requireUser } from "~/utils/auth.server";
 import LabeledInput from "~/components/LabeledInput";
+import { createProject } from "~/models/prisma/projects";
 
 export const action = (async ({ request }) => {
   const user = await requireUser(request);
@@ -11,8 +11,6 @@ export const action = (async ({ request }) => {
   const formData = await request.formData();
   const projectName = formData.get("projectName") as string;
   const description = formData.get("description") as string;
-
-  console.log("user", user);
 
   await createProject(user.id, projectName, description);
 

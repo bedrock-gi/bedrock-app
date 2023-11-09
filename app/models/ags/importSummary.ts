@@ -1,0 +1,124 @@
+import { Ags } from "./models";
+import type { AgsMappingAny, TableMapping } from "./mappings";
+import { mappings, mappingsHierarchy } from "./mappings";
+
+import { parseAgsGroup } from "./parse";
+import type { ObjectWithStringKeys } from "../../types/agsMapping";
+import { readFileSync, writeFileSync } from "fs";
+import type { AgsUpload } from "@prisma/client";
+
+type AgsUploadSummary = {
+  numNewRecords: number;
+  numUpdatedRecords: number;
+  mapping: AgsMappingAny;
+};
+
+type AgsUploadSummaryBlob = {
+  newRecords: ObjectWithStringKeys[];
+  updatedRecords: ObjectWithStringKeys[];
+  mappingKey: string;
+};
+
+function saveRecordsToBlob(uploadId: string, records: AgsUploadSummaryBlob[]) {
+  const asJson = JSON.stringify(records);
+
+  writeFileSync(`./uploads/${uploadId}.json`, asJson);
+}
+
+export async function createAgsImportSummary(
+  inputFile: string,
+  projectId: string,
+  uploadId: string
+) {
+  const ags = new Ags(inputFile);
+
+  const groups: AgsUploadSummaryBlob[] = [];
+
+  const stack = [mappingsHierarchy];
+
+  while (stack.length > 0) {
+    const currentMapping = stack.pop();
+    if (!currentMapping) {
+      throw new Error("No current mapping");
+    }
+    const agsGroup = ags.agsData[currentMapping.mapping.agsTableName];
+
+    console.log("parsing", currentMapping.mapping.agsTableName);
+    const records = parseAgsGroup(agsGroup, currentMapping.mapping);
+    console.log("parsed", currentMapping.mapping.agsTableName);
+    console.log(records.parsedRecords[0]);
+
+    const { newRecords, updatedRecords } =
+      await currentMapping.mapping.findExistingRecords(
+        records.parsedRecords,
+        projectId
+      );
+
+    const summary = {
+      newRecords,
+      updatedRecords,
+      mappingKey: currentMapping.mapping.prismaLabel,
+      mapping: currentMapping.mapping,
+    };
+
+    console.log("adding summary", summary.mappingKey);
+    groups.push(summary);
+
+    if (currentMapping.children) {
+      stack.push(...currentMapping.children);
+    }
+  }
+
+  console.log("groups", groups);
+  console.log("groups", groups);
+
+  saveRecordsToBlob(
+    uploadId,
+    groups.map((group) => ({
+      newRecords: group.newRecords,
+      updatedRecords: group.updatedRecords,
+      mappingKey: group.mappingKey,
+    }))
+  );
+
+  const agsUploadSummary: AgsUploadSummary[] = groups.map((group) => {
+    return {
+      mapping: mappings[group.mappingKey as keyof typeof mappings],
+      numNewRecords: group.newRecords.length,
+      numUpdatedRecords: group.updatedRecords.length,
+    };
+  });
+
+  return agsUploadSummary;
+}
+
+export async function uploadToPrismaFromBlob(upload: AgsUpload) {
+  const blob = readFileSync(`./uploads/${upload.id}.json`, "utf-8");
+  const agsUpload: AgsUploadSummaryBlob[] = JSON.parse(blob);
+
+  console.log("starting upload");
+
+  async function uploadToPrisma(tableMapping: TableMapping) {
+    console.log(`uploading ${tableMapping.mapping.prismaLabel}`);
+    const agsUploadGroup = agsUpload.find(
+      (group) => group.mappingKey === tableMapping.mapping.prismaLabel
+    );
+
+    if (agsUploadGroup) {
+      await tableMapping.mapping.createRecords(
+        agsUploadGroup.newRecords,
+        upload.projectId
+      );
+
+      await tableMapping.mapping.updateRecords(agsUploadGroup.updatedRecords);
+    }
+
+    if (tableMapping.children) {
+      tableMapping.children.forEach(async (child) => {
+        await uploadToPrisma(child);
+      });
+    }
+  }
+
+  await uploadToPrisma(mappingsHierarchy);
+}

@@ -5,8 +5,7 @@ import {
 } from "@tanstack/react-table";
 
 import type { TableConfig } from "./TableConfig";
-import { createColumns } from "./TableConfig";
-import type { ObjectWithStringKeys } from "~/models/ags/mappingUtils";
+import type { ObjectWithStringKeys } from "~/types/agsMapping";
 
 interface Props<T extends ObjectWithStringKeys> {
   data: T[];
@@ -17,7 +16,7 @@ export function Table<T extends ObjectWithStringKeys>({
   data,
   tableConfig,
 }: Props<T>) {
-  const columns = createColumns(tableConfig);
+  const columns = tableConfig.getTableColumns();
 
   const table = useReactTable({
     data,

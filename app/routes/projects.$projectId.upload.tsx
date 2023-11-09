@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import type { LoaderArgs, ActionArgs } from "@remix-run/node";
 import {
   unstable_composeUploadHandlers,
   unstable_createMemoryUploadHandler,
@@ -10,32 +10,22 @@ import { redirect, typedjson } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 import { createWriteStream } from "fs";
 import { v4 as uuidv4 } from "uuid";
-import { createAgsUpload } from "~/models/agsUploads";
+import { createAgsUpload } from "~/models/prisma/agsUploads";
+import invariant from "tiny-invariant";
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
-
-  //   console.log("request", request);
+export const loader = async ({ params, request }: LoaderArgs) => {
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    console.log("redirecting");
-    return redirect("/projects");
-  }
+  invariant(role);
 
   return typedjson({ role });
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
+export const action = async ({ request, params }: ActionArgs) => {
+  invariant(params.projectId);
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    return redirect("/projects");
-  }
+  invariant(role);
   const uploadHandler = unstable_composeUploadHandlers(
     async ({ name, contentType, data, filename }) => {
       const randomId = uuidv4();

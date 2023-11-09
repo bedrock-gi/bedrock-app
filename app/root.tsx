@@ -1,8 +1,11 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
+
 import { Sidebar } from "./components/Sidebar";
 import { useState } from "react";
 
@@ -32,16 +35,10 @@ export default function App() {
       </head>
 
       <body>
-        <div className="flex h-screen">
-          <div
-            className={`flex-shrink-0 transition-all duration-300 ${
-              isSidebarExpanded ? "w-64" : "w-16"
-            }`}
-          >
-            <Sidebar
-              isExpanded={isSidebarExpanded}
-              toggle={() => setSidebarExpanded(!isSidebarExpanded)}
-            />
+        <ToastContainer />
+        <div className="flex h-screen flex-row">
+          <div className="h-full w-1/5">
+            <Sidebar></Sidebar>
           </div>
 
           <div className="h-full flex-grow">

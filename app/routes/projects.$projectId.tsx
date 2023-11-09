@@ -1,17 +1,15 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
+import type { RouteMatch } from "@remix-run/react";
 import { Link, Outlet } from "@remix-run/react";
-import { redirect, typedjson } from "remix-typedjson";
+import { typedjson } from "remix-typedjson";
+import invariant from "tiny-invariant";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
+export const loader = async ({ params, request }: LoaderArgs) => {
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    return redirect("/projects");
-  }
+  invariant(role);
 
   return typedjson({ role });
 };

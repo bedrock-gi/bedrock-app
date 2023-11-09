@@ -1,10 +1,11 @@
+import { LoaderArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
+import { Project } from "@prisma/client";
 import { requireUser } from "~/utils/auth.server";
-import { getProjectsWithLocations } from "~/models/projects";
+
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import ProjectsMap from "~/components/Map/ProjectsMap";
-import { ProjectCard } from "~/components/Project/ProjectCard";
-import type { LoaderFunction } from "@remix-run/node";
+import { getProjectsWithLocations } from "~/models/prisma/projects";
 
 export const loader = (async ({ request }) => {
   const user = await requireUser(request);

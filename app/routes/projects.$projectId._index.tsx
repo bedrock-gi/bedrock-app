@@ -1,39 +1,28 @@
 import type { Location } from "@prisma/client";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
+
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import invariant from "tiny-invariant";
 import { LocationsMap } from "~/components/Map/LocationsMap";
 import { Table } from "~/components/Table/Table";
-import type { TableConfig } from "~/components/Table/TableConfig";
-import { getLocations, seedLocations } from "~/models/locations";
+import { TableConfig } from "~/components/Table/TableConfig";
+import { locationMapping } from "~/models/ags/mappings/location";
+import { getLocations, seedLocations } from "~/models/prisma/locations";
+
 import { requireUserProjectRole } from "~/utils/auth.server";
 
-const locationTableConfig: TableConfig<Location> = {
-  id: "loca",
-  title: "Locations",
-  columns: [
-    {
-      label: "Name",
-      accessor: "name",
-    },
-    {
-      accessor: "latitude",
-    },
-    {
-      accessor: "longitude",
-    },
-  ],
-};
+const locationTableConfig = new TableConfig<Location>(
+  "loca",
+  "Locations",
+  locationMapping
+);
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  if (!params.projectId) {
-    return redirect("/projects");
-  }
+export async function loader({ params, request }: LoaderArgs) {
+  invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
-  if (!role) {
-    return redirect("/projects");
-  }
+  invariant(role);
 
   const locations = await getLocations(params.projectId);
   if (locations.length === 0) {
