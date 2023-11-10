@@ -1,8 +1,8 @@
-import type { ZodObject, ZodTypeAny } from "zod";
+import type { ZodObject, ZodType, ZodTypeAny } from "zod";
 import { ZodNumber, z, ZodNullable, ZodDate } from "zod";
 import type { ObjectWithStringKeys, DataColumns } from "../../types/agsMapping";
 
-export type ZodPrismaType<T extends ObjectWithStringKeys> = ZodObject<
+export type ZodPrismaType<T extends ObjectWithStringKeys> = ZodType<
   DataColumns<T>
 >;
 
