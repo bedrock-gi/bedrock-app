@@ -2,7 +2,7 @@ import type { ZodObject, ZodTypeAny } from "zod";
 import { ZodNumber, z, ZodNullable, ZodDate } from "zod";
 import type { ObjectWithStringKeys, DataColumns } from "../../types/agsMapping";
 
-export type ZodPrismaType<T extends ObjectWithStringKeys> = z.ZodType<
+export type ZodPrismaType<T extends ObjectWithStringKeys> = ZodObject<
   DataColumns<T>
 >;
 
@@ -14,9 +14,6 @@ export const parseRecordsToZod = <T extends ObjectWithStringKeys>(
   errors: string[];
 } => {
   const errors: string[] = [];
-  console.log("parsing records", records.length);
-  console.log("zodSchema", zodSchema);
-  console.log("records", records);
 
   const parsedRecords = records.map((record) => {
     try {
@@ -30,7 +27,7 @@ export const parseRecordsToZod = <T extends ObjectWithStringKeys>(
   });
   const filteredRecords = parsedRecords.filter(
     (record) => record !== undefined
-  ) as DataColumns<T>[];
+  ) as unknown as DataColumns<T>[];
   return { parsedRecords: filteredRecords, errors };
 };
 
@@ -91,10 +88,7 @@ export function makeNullableOptional<
 
   const updatedShape = Object.fromEntries(
     Object.entries(shape).map(([key, value]: [string, ZodTypeAny]) => {
-      // console.log(key, value._def);
       if (value instanceof ZodNullable) {
-        console.log("nullable", key, value._def.innerType._def);
-
         return [key, value._def.innerType.optional()];
       }
 

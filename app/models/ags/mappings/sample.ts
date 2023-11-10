@@ -1,11 +1,10 @@
 import type { Location, Sample } from "@prisma/client";
 
 import { SampleSchema } from "prisma/generated/zod";
-import { z } from "zod";
+
 import { prisma } from "~/db.server";
 import type { DataColumns } from "~/types/agsMappingConfig";
 import { AgsMapping } from "~/types/agsMappingConfig";
-import { prepareAgsZodSchema } from "../zod";
 
 // TODO: finish basic method of checking if sample exists by continuing below method.
 // after this is done, do the same thing with a child of SAMP table.
@@ -137,13 +136,10 @@ class SampleMapping extends AgsMapping<
 }
 
 export const sampleMapping = new SampleMapping(
-  prepareAgsZodSchema(SampleSchema)
-    .omit({
-      locationId: true,
-    })
-    .extend({
-      name: z.string(),
-    }),
+  ["locationId"],
+  ["name"],
+
+  SampleSchema,
   "SAMP",
   "sample",
   {

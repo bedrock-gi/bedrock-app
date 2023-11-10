@@ -1,4 +1,5 @@
 import type { ZodPrismaType } from "../models/ags/zod";
+import { prepareAgsZodSchema } from "../models/ags/zod";
 
 export type ObjectWithStringKeys = {
   [key: string]: any;
@@ -21,24 +22,35 @@ export abstract class AgsMapping<
   InheritedFields extends Partial<Parent>
 > {
   constructor(
+    public omitFields: (keyof OmitFields)[],
+    public inheritedFields: (keyof InheritedFields)[],
     public zodSchema: ZodPrismaType<
-      Omit<T, keyof OmitFields> & InheritedFields
+      Omit<DataColumns<T>, keyof OmitFields> & InheritedFields
     >,
     public agsTableName: string,
     public prismaLabel: string,
     public columns: {
-      [agsColumnName: string]: keyof (Omit<T, keyof OmitFields> &
+      [agsColumnName: string]: keyof (Omit<DataColumns<T>, keyof OmitFields> &
         InheritedFields);
     },
     public uniqueConstraint: keyof DataColumns<T>[],
-    public parent?: Parent
+    public parentMapping?: AgsMapping<
+      Parent,
+      ObjectWithStringKeys,
+      any,
+      ObjectWithStringKeys
+    >
   ) {
     this.agsTableName = agsTableName;
     this.prismaLabel = prismaLabel;
-    this.parent = parent;
+
     this.columns = columns;
-    this.zodSchema = zodSchema;
     this.uniqueConstraint = uniqueConstraint;
+    this.parentMapping = parentMapping;
+    this.omitFields = omitFields;
+    this.inheritedFields = inheritedFields;
+
+    this.zodSchema = zodSchema;
   }
 
   abstract createRecords(

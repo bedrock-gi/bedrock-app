@@ -52,7 +52,7 @@ let auth0Strategy = new Auth0Strategy(
 
     // Get the user data from your DB or API using the tokens and profile
     const user = await getOrCreateUser(profile.emails[0].value);
-    console.log("user", user);
+    
     return user;
   }
 );
