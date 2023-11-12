@@ -44,31 +44,7 @@ export class LocationMapping extends AgsMapping<
     });
   }
 
-  async findExistingRecords(
-    records: DataColumns<Location>[],
-    projectId: string
-  ) {
-    const existingRecords = await prisma.location.findMany({
-      where: {
-        projectId,
-        name: {
-          in: records.map((record) => record.name),
-        },
-      },
-    });
-
-    const newRecords = records.filter(
-      (record) =>
-        !existingRecords.find(
-          (existingRecord) => existingRecord.name === record.name
-        )
-    );
-
-    return {
-      newRecords,
-      updatedRecords: existingRecords,
-    };
-  }
+  //
 }
 
 export const locationMapping = new LocationMapping(
@@ -128,5 +104,5 @@ export const locationMapping = new LocationMapping(
     LOCA_ORCO: "originatingCompany",
   },
 
-  ["name"] as unknown as keyof DataColumns<Location>[]
+  ["name", "projectId"]
 );
