@@ -1,7 +1,7 @@
 import { prisma } from "~/db.server";
 import { AgsMapping } from "../../../types/agsMappingConfig";
 
-import type { Location, Project } from "@prisma/client";
+import type { Location } from "@prisma/client";
 
 import {
   LocationSchema,
@@ -12,7 +12,6 @@ import { prepareAgsZodSchema } from "../zod";
 
 export class LocationMapping extends AgsMapping<
   Location,
-  Project,
   {
     projectId: string;
   },

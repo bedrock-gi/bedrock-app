@@ -12,16 +12,33 @@ export type DataColumns<T extends ObjectWithStringKeys> = Omit<
   "createdAt" | "updatedAt" | "id" | "customColumns"
 >;
 
-type AgsUploadRecords<T extends ObjectWithStringKeys> = {
-  newRecords: DataColumns<T>[];
+// type PrismaRecordWithParent<
+//   T extends ObjectWithStringKeys,
+//   K extends AgsMapping<T, any, any>
+// > = T & {
+//   [key: string]: PrismaRecordWithParent<T, K["parentMapping"]> | undefined;
+// };
+
+type AgsUploadRecords<
+  T extends ObjectWithStringKeys,
+  M extends AgsMapping<T, any, any>
+> = {
+  newRecords: IncomingRecord<M>[];
   updatedRecords: T[];
 };
 
+// type to create a union from array of string literals
+
+type IncomingRecord<T extends AgsMapping<any, any, any>> = Omit<
+  DataColumns<T>,
+  keyof T["omitFields"]
+> &
+  T["inheritedFields"];
+
 export abstract class AgsMapping<
   T extends ObjectWithStringKeys,
-  Parent extends ObjectWithStringKeys,
   OmitFields extends Partial<T>,
-  InheritedFields extends Partial<Parent>
+  InheritedFields extends ObjectWithStringKeys
 > {
   constructor(
     public omitFields: (keyof OmitFields)[],
@@ -37,7 +54,6 @@ export abstract class AgsMapping<
     },
     public uniqueConstraint: (keyof DataColumns<T>)[],
     public parentMapping?: AgsMapping<
-      Parent,
       ObjectWithStringKeys,
       any,
       ObjectWithStringKeys
@@ -75,7 +91,7 @@ export abstract class AgsMapping<
   }
 
   #prepareFindExistingRecordsQuery(
-    records: DataColumns<T>[],
+    records: IncomingRecord<this>[],
     projectId: string
   ) {
     const orClauses = records.map((record) => {
@@ -83,7 +99,10 @@ export abstract class AgsMapping<
 
       const where = uniqueConstraint.reduce((acc, key) => {
         acc[key] = {
-          equals: key === "projectId" ? projectId : record[key],
+          equals:
+            key === "projectId"
+              ? projectId
+              : record[key as keyof IncomingRecord<this>],
         };
 
         return acc;
@@ -93,20 +112,22 @@ export abstract class AgsMapping<
         AND: where,
       };
 
-      let currentMapping: AgsMappingAny | undefined =
+      let currentMapping: (typeof this)["parentMapping"] =
         this.parentMapping || undefined;
 
       const pathToParent = [];
 
       while (currentMapping) {
-        const parentUniqueConstraint =
-          currentMapping.uniqueConstraint as string[];
+        const parentUniqueConstraint = currentMapping.uniqueConstraint;
 
         pathToParent.push(currentMapping.prismaLabel);
 
         const parentClause = parentUniqueConstraint.reduce((acc, key) => {
           acc[key] = {
-            equals: key === "projectId" ? projectId : record[key],
+            equals:
+              key === "projectId"
+                ? projectId
+                : record[key as keyof IncomingRecord<this>],
           };
 
           return acc;
@@ -154,26 +175,86 @@ export abstract class AgsMapping<
     return query;
   }
 
+  #incomingRecordinExistingRecords(
+    incomingRecord: IncomingRecord<this>,
+    existingRecords: (T & {
+      [key: string]: any;
+    })[]
+  ) {
+    const found = existingRecords.find((existingRecord) => {
+      const uniqueConstraintForType = this.uniqueConstraint.filter(
+        (key) => !this.omitFields.includes(key)
+      );
+
+      if (
+        !uniqueConstraintForType.every(
+          (key) =>
+            existingRecord[key] ===
+            incomingRecord[key as keyof IncomingRecord<this>]
+        )
+      ) {
+        // console.log("unique constraint failed on first level");
+        return false;
+      }
+
+      let currentMapping: AgsMappingAny | undefined =
+        this.parentMapping || undefined;
+      const pathToParent: string[] = [];
+
+      while (currentMapping) {
+        const parentUniqueConstraint =
+          currentMapping.uniqueConstraint as string[];
+
+        pathToParent.push(currentMapping.prismaLabel);
+        const uniqueConstraintForType = parentUniqueConstraint.filter(
+          (key) => !currentMapping.omitFields.includes(key)
+        );
+
+        if (
+          !uniqueConstraintForType.every((key) => {
+            let value = existingRecord;
+            pathToParent.forEach((path) => {
+              value = value[path];
+            });
+            return (
+              value[key] === incomingRecord[key as keyof IncomingRecord<this>]
+            );
+          })
+        ) {
+          // console.log("unique constraint failed on parent level");
+          return false;
+        }
+        currentMapping = currentMapping.parentMapping;
+      }
+      return true;
+    });
+
+    return found;
+
+    // we need to check all the values for the incoming record
+    // and then recursively check the values for the parent records
+    // const parentRelationKey = this.parentMapping?.prismaLabel;
+  }
+
   // TODO fix this function
   #createAgsUploadRecords(
     existingRecords: T[],
-    incomingRecords: DataColumns<T>[]
-  ): AgsUploadRecords<T> {
-    const newRecords: DataColumns<T>[] = [];
+    incomingRecords: IncomingRecord<this>[]
+  ) {
+    const newRecords: IncomingRecord<this>[] = [];
     const updatedRecords: T[] = [];
 
     incomingRecords.forEach((incomingRecord) => {
-      const existingRecord = existingRecords.find((existingRecord) => {
-        return this.uniqueConstraint.every((key) => {
-          return existingRecord[key] === incomingRecord[key];
-        });
-      });
+      const existingRecord = this.#incomingRecordinExistingRecords(
+        incomingRecord,
+        existingRecords
+      );
 
       if (existingRecord) {
         updatedRecords.push(existingRecord);
-      } else {
-        newRecords.push(incomingRecord);
+        return;
       }
+      newRecords.push(incomingRecord);
     });
 
     return {
@@ -183,9 +264,9 @@ export abstract class AgsMapping<
   }
 
   async findExistingRecords(
-    records: DataColumns<T>[],
+    records: IncomingRecord<this>[],
     projectId: string
-  ): Promise<AgsUploadRecords<T>> {
+  ): Promise<AgsUploadRecords<T, this>> {
     const queryData = this.#prepareFindExistingRecordsQuery(records, projectId);
 
     // @ts-ignore - this is a hack to get around the fact that the type of the
@@ -193,8 +274,6 @@ export abstract class AgsMapping<
     const existingRecords: T[] = await prisma[this.prismaLabel].findMany(
       queryData
     );
-
-    console.log("existingRecords", existingRecords.length);
 
     const summary = this.#createAgsUploadRecords(existingRecords, records);
     console.log("summary", {

@@ -15,7 +15,6 @@ import { locationMapping } from "./location";
 
 class SampleMapping extends AgsMapping<
   Sample,
-  Location,
   {
     locationId: string;
   },
