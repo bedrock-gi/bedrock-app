@@ -1,11 +1,16 @@
 import type { ZodPrismaType } from "../models/ags/zod";
 import { prisma } from "~/db.server";
-import type { AgsMappingAny } from "~/models/ags/mappings";
 import set from "set-value";
 
 export type ObjectWithStringKeys = {
   [key: string]: any;
 };
+
+export type AgsMappingAny = AgsMapping<
+  ObjectWithStringKeys,
+  any,
+  ObjectWithStringKeys
+>;
 
 export type DataColumns<T extends ObjectWithStringKeys> = Omit<
   T,
@@ -207,7 +212,7 @@ export abstract class AgsMapping<
 
         pathToParent.push(currentMapping.prismaLabel);
         const uniqueConstraintForType = parentUniqueConstraint.filter(
-          (key) => !currentMapping.omitFields.includes(key)
+          (key) => !currentMapping?.omitFields.includes(key)
         );
 
         if (

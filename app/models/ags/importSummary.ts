@@ -1,16 +1,19 @@
 import { Ags } from "./models";
-import type { AgsMappingAny, TableMapping } from "./mappings";
+import type { TableMapping } from "./mappings";
 import { mappings, mappingsHierarchy } from "./mappings";
 
 import { parseAgsGroup } from "./parse";
-import type { ObjectWithStringKeys } from "../../types/agsMapping";
+import type {
+  AgsMapping,
+  ObjectWithStringKeys,
+} from "../../types/agsMappingConfig";
 import { readFileSync, writeFileSync } from "fs";
 import type { AgsUpload } from "@prisma/client";
 
 type AgsUploadSummary = {
   numNewRecords: number;
   numUpdatedRecords: number;
-  mapping: AgsMappingAny;
+  mapping: AgsMapping<any, any, any>;
 };
 
 type AgsUploadSummaryBlob = {
