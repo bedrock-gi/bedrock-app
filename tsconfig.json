@@ -10,6 +10,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "strictNullChecks": true,
     "target": "ES2019",
     "strict": true,
     "allowJs": true,

@@ -119,40 +119,41 @@ model Sample {
   location   Location @relation(fields: [locationId], references: [id])
   locationId String // Unique Identifier
 
-  depthTop                        Float? // m 2DP Depth to top of sample
-  sampleReference                 String? // Sample reference
-  sampleType                      String? // PA Sample type
-  sampleUniqueID                  String? // ID Sample unique identifier
-  depthBase                       Float? // m 2DP Depth to base of sample
-  dateAndTimeSampleTaken          DateTime? // Date and time sample taken
-  numBlowsRequired                Int? // 0DP Number of blows required to drive sampler
-  sampleContainer                 String? // Sample container
-  samplePreparation               String? // Details of sample preparation at the time of sampling
-  sampleDiameter                  Float? // mm 0DP Sample diameter
-  depthToWaterBelowGroundSurface  Float? // m 2DP Depth to water below ground surface at the time of sampling
-  percentageSampleRecovered       Float? // % 0DP Percentage of sample recovered
-  samplingTechnique               String? // X Sample QA type (Normal, blank, or spike)
-  sampleMatrix                    String? // Sample matrix
-  sampleQAType                    String? // Sample QA type (Normal, blank, or spike)
-  samplerInitials                 String? // Samplers initials or name
-  reasonForSampling               String? // Reason for sampling
-  sampleRemarks                   String? // Sample remarks
-  sampleDescription               String? // Sample/specimen description
-  dateSampleDescribed             DateTime? // Date sample described
-  personResponsibleForDescription String? // Person responsible for sample/specimen description
-  sampleCondition                 String? // Condition and representativeness of sample
-  sampleClassification            String? // Sample classification as required by EN ISO 14688-1
-  barometricPressure              Float? // bar 1DP Barometric pressure at the time of sampling
-  sampleTemperature               Float? // DegC 0DP Sample temperature at the time of sampling
-  gasPressureAboveBarometric      Float? // bar 1DP Gas pressure (above barometric)
-  gasFlowRate                     Float? // l/min 1DP Gas flow rate
-  dateAndTimeSamplingCompleted    DateTime? // Date and time sampling completed
-  samplingDuration                String? // T Sampling duration
-  captionUsedToDescribeSample     String? // Caption used to describe sample
-  sampleRecordLink                String? // RL Sample record link
-  stratumReference                String? // X Stratum reference shown on trial pit or traverse sketch
-  associatedFileReference         String? // X Associated file reference (e.g. sampling field sheets, sample description records)
-  lengthSampleRecovered           Float? // mm 0DP Length of sample recovered
+  depthTop                                Float? // m 2DP Depth to top of sample
+  sampleReference                         String? // Sample reference
+  sampleType                              String? // PA Sample type
+  sampleUniqueID                          String? // ID Sample unique identifier
+  depthBase                               Float? // m 2DP Depth to base of sample
+  dateAndTimeSampleTaken                  DateTime? // Date and time sample taken
+  numBlowsRequired                        Int? // 0DP Number of blows required to drive sampler
+  sampleContainer                         String? // Sample container
+  samplePreparation                       String? // Details of sample preparation at the time of sampling
+  sampleDiameter                          Float? // mm 0DP Sample diameter
+  depthToWaterBelowGroundSurface          Float? // m 2DP Depth to water below ground surface at the time of sampling
+  percentageSampleRecovered               Float? // % 0DP Percentage of sample recovered
+  samplingTechnique                       String? // X Sample QA type (Normal, blank, or spike)
+  sampleMatrix                            String? // Sample matrix
+  sampleQAType                            String? // Sample QA type (Normal, blank, or spike)
+  samplerInitials                         String? // Samplers initials or name
+  reasonForSampling                       String? // Reason for sampling
+  sampleRemarks                           String? // Sample remarks
+  sampleDescription                       String? // Sample/specimen description
+  dateSampleDescribed                     DateTime? // Date sample described
+  personResponsibleForDescription         String? // Person responsible for sample/specimen description
+  sampleCondition                         String? // Condition and representativeness of sample
+  sampleClassification                    String? // Sample classification as required by EN ISO 14688-1
+  barometricPressure                      Float? // bar 1DP Barometric pressure at the time of sampling
+  sampleTemperature                       Float? // DegC 0DP Sample temperature at the time of sampling
+  gasPressureAboveBarometric              Float? // bar 1DP Gas pressure (above barometric)
+  gasFlowRate                             Float? // l/min 1DP Gas flow rate
+  dateAndTimeSamplingCompleted            DateTime? // Date and time sampling completed
+  samplingDuration                        String? // T Sampling duration
+  captionUsedToDescribeSample             String? // Caption used to describe sample
+  sampleRecordLink                        String? // RL Sample record link
+  stratumReference                        String? // X Stratum reference shown on trial pit or traverse sketch
+  associatedFileReference                 String? // X Associated file reference (e.g. sampling field sheets, sample description records)
+  lengthSampleRecovered                   Float? // mm 0DP Length of sample recovered
+  particleSizeDistributionAnalysisGeneral ParticleSizeDistributionAnalysisGeneral[]
 
   @@unique([locationId, sampleUniqueID, sampleType, depthTop, sampleReference])
 }
@@ -192,6 +193,43 @@ model AgsUpload {
   status              AgsUploadStatus
   newRecordsCount     Int?
   updatedRecordsCount Int?
+}
+
+model ParticleSizeDistributionAnalysisGeneral {
+  id        String   @id @default(uuid()) // Unique Identifier
+  createdAt DateTime @default(now()) // Date time in international format
+  updatedAt DateTime @updatedAt // Date time in international format
+
+  // Relation to Sample model
+  sample   Sample @relation(fields: [sampleId], references: [id])
+  sampleId String // Link to Sample table
+
+  specimenReference                 String? // Specimen reference
+  depthToTopOfSpecimen              Float? // Depth to top of test specimen
+  specimenDescription               String? // Specimen description
+  detailsOfSpecimenPreparation      String? // Details of specimen preparation
+  uniformityCoefficient             Float? // Uniformity coefficient
+  percentageGreaterThan63mm         Float? // Percentage of material tested greater than 63mm
+  percentageGravel                  Float? // Percentage of material tested in range 63mm to 2mm
+  percentageSand                    Float? // Percentage of material tested in range 2mm to 63um
+  percentageSilt                    Float? // Percentage of material tested in range 63um to 2um
+  percentageClay                    Float? // Percentage of material tested less than 2um
+  percentageLessThan63um            Float? // Percentage less than 63um
+  remarks                           String? // Remarks
+  testMethod                        String? // Test method
+  testingLaboratory                 String? // Name of testing laboratory/organization
+  accreditingBody                   String? // Accrediting body and reference number
+  testStatus                        String? // Test status
+  associatedFileReference           String? // Associated file reference
+  depthToBaseOfSpecimen             Float? // Depth to base of specimen
+  deviationFromTestProcedure        String? // Any deviation from the specified test procedure
+  particleDensityUsedInCalculations String? // Particle density used in calculations
+  methodOfPreTreatment              String? // Method of pre-treatment
+  soilTestSufficient                String? // Amount of soil tested was sufficient (YN)
+  exclusionRemark                   String? // Remark if the size of the fractions is not expressed as percentage of total dry mass
+  coefficientOfCurvature            Float? // Coefficient of curvature
+
+  @@unique([sampleId, specimenReference, depthToTopOfSpecimen]) // Unique composite key
 }
 
 // model LabTest {

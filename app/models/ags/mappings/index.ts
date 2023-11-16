@@ -1,11 +1,8 @@
-import type { AgsMapping } from "../../../types/agsMappingConfig";
 import { locationMapping } from "./location";
 import { sampleMapping } from "./sample";
 
-export type AgsMappingAny = AgsMapping<any, any, any, any>;
-
 export type TableMapping = {
-  mapping: AgsMappingAny;
+  mapping: any;
   children: TableMapping[];
 };
 

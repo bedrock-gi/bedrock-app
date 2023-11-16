@@ -43,10 +43,7 @@ export async function createAgsImportSummary(
     }
     const agsGroup = ags.agsData[currentMapping.mapping.agsTableName];
 
-    console.log("parsing", currentMapping.mapping.agsTableName);
     const records = parseAgsGroup(agsGroup, currentMapping.mapping);
-    console.log("parsed", currentMapping.mapping.agsTableName);
-    console.log(records.parsedRecords[0]);
 
     const { newRecords, updatedRecords } =
       await currentMapping.mapping.findExistingRecords(
@@ -61,16 +58,12 @@ export async function createAgsImportSummary(
       mapping: currentMapping.mapping,
     };
 
-    console.log("adding summary", summary.mappingKey);
     groups.push(summary);
 
     if (currentMapping.children) {
       stack.push(...currentMapping.children);
     }
   }
-
-  console.log("groups", groups);
-  console.log("groups", groups);
 
   saveRecordsToBlob(
     uploadId,
@@ -96,10 +89,7 @@ export async function uploadToPrismaFromBlob(upload: AgsUpload) {
   const blob = readFileSync(`./uploads/${upload.id}.json`, "utf-8");
   const agsUpload: AgsUploadSummaryBlob[] = JSON.parse(blob);
 
-  console.log("starting upload");
-
   async function uploadToPrisma(tableMapping: TableMapping) {
-    console.log(`uploading ${tableMapping.mapping.prismaLabel}`);
     const agsUploadGroup = agsUpload.find(
       (group) => group.mappingKey === tableMapping.mapping.prismaLabel
     );

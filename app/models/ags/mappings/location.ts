@@ -1,17 +1,17 @@
 import { prisma } from "~/db.server";
 import { AgsMapping } from "../../../types/agsMappingConfig";
-import { prepareAgsZodSchema } from "../zod";
-import type { Location, Project } from "@prisma/client";
+
+import type { Location } from "@prisma/client";
 
 import {
   LocationSchema,
   LocationCreateManyArgsSchema,
 } from "prisma/generated/zod";
-import type { DataColumns } from "~/types/agsMapping";
+import type { DataColumns } from "~/types/agsMappingConfig";
+import { prepareAgsZodSchema } from "../zod";
 
 export class LocationMapping extends AgsMapping<
   Location,
-  Project,
   {
     projectId: string;
   },
@@ -43,37 +43,18 @@ export class LocationMapping extends AgsMapping<
     });
   }
 
-  async findExistingRecords(
-    records: DataColumns<Location>[],
-    projectId: string
-  ) {
-    const existingRecords = await prisma.location.findMany({
-      where: {
-        projectId,
-        name: {
-          in: records.map((record) => record.name),
-        },
-      },
-    });
-
-    const newRecords = records.filter(
-      (record) =>
-        !existingRecords.find(
-          (existingRecord) => existingRecord.name === record.name
-        )
-    );
-
-    return {
-      newRecords,
-      updatedRecords: existingRecords,
-    };
-  }
+  //
 }
 
 export const locationMapping = new LocationMapping(
-  prepareAgsZodSchema(LocationSchema).omit({
-    projectId: true,
-  }),
+  ["projectId"],
+  [],
+  prepareAgsZodSchema(
+    LocationSchema.omit({
+      projectId: true,
+    })
+  ),
+
   "LOCA",
   "location",
   {
@@ -121,5 +102,6 @@ export const locationMapping = new LocationMapping(
     LOCA_ORJO: "originalJobReference",
     LOCA_ORCO: "originatingCompany",
   },
-  ["name"] as unknown as keyof DataColumns<Location>[]
+
+  ["name", "projectId"]
 );

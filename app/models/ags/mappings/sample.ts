@@ -1,11 +1,13 @@
-import type { Location, Sample } from "@prisma/client";
+import type { Sample } from "@prisma/client";
 
 import { SampleSchema } from "prisma/generated/zod";
-import { z } from "zod";
+
 import { prisma } from "~/db.server";
 import type { DataColumns } from "~/types/agsMappingConfig";
 import { AgsMapping } from "~/types/agsMappingConfig";
 import { prepareAgsZodSchema } from "../zod";
+import { z } from "zod";
+import { locationMapping } from "./location";
 
 // TODO: finish basic method of checking if sample exists by continuing below method.
 // after this is done, do the same thing with a child of SAMP table.
@@ -13,7 +15,6 @@ import { prepareAgsZodSchema } from "../zod";
 
 class SampleMapping extends AgsMapping<
   Sample,
-  Location,
   {
     locationId: string;
   },
@@ -21,63 +22,6 @@ class SampleMapping extends AgsMapping<
     name: string;
   }
 > {
-  async findExistingRecords(
-    records: (Sample & { locationName: string })[],
-
-    projectId: string
-  ) {
-    const existingRecords = await prisma.sample.findMany({
-      where: {
-        OR: records.map(
-          ({
-            depthTop,
-            locationName,
-            sampleType,
-            sampleUniqueID,
-            sampleReference,
-          }) => {
-            return {
-              depthTop,
-              location: {
-                name: locationName,
-                projectId,
-              },
-              sampleType,
-              sampleReference,
-              sampleUniqueID,
-            };
-          }
-        ),
-      },
-
-      include: {
-        location: true,
-      },
-    });
-
-    // find the new records, by comparing the existing records to the records
-    // that were passed in.
-    const newRecords = records.filter((record) => {
-      return !existingRecords.some(
-        (existingRecord) =>
-          existingRecord.depthTop === record.depthTop &&
-          existingRecord.sampleType === record.sampleType &&
-          existingRecord.sampleReference === record.sampleReference &&
-          existingRecord.sampleUniqueID === record.sampleUniqueID &&
-          existingRecord.location.name === record.locationName
-      );
-    });
-
-    return {
-      newRecords: newRecords,
-      updatedRecords: existingRecords.map(({ location, ...rest }) => ({
-        ...rest,
-        locationName: location.name,
-        locationId: location.id,
-      })),
-    };
-  }
-
   async createRecords(records: any[], projectId: string) {
     const recordsParsed = records.map((record) => this.zodSchema.parse(record));
 
@@ -127,13 +71,17 @@ class SampleMapping extends AgsMapping<
 }
 
 export const sampleMapping = new SampleMapping(
+  ["locationId"],
+  ["name"],
+
   prepareAgsZodSchema(SampleSchema)
-    .omit({
-      locationId: true,
-    })
     .extend({
       name: z.string(),
+    })
+    .omit({
+      locationId: true,
     }),
+
   "SAMP",
   "sample",
   {
@@ -173,11 +121,6 @@ export const sampleMapping = new SampleMapping(
     FILE_FSET: "associatedFileReference", // X Associated file reference (e.g. sampling field sheets, sample description records)
     SAMP_RECL: "lengthSampleRecovered", // mm 0DP Length of sample recovered
   },
-  [
-    "depthTop",
-    "sampleType",
-    "sampleReference",
-    "sampleUniqueID",
-    "locationId",
-  ] as unknown as keyof Sample[]
+  ["depthTop", "sampleType", "sampleReference", "sampleUniqueID", "locationId"],
+  locationMapping
 );
