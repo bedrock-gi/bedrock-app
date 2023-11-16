@@ -1,4 +1,4 @@
-import type { Location, Sample } from "@prisma/client";
+import type { Sample } from "@prisma/client";
 
 import { SampleSchema } from "prisma/generated/zod";
 

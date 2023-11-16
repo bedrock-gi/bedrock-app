@@ -7,7 +7,7 @@ import {
   LocationSchema,
   LocationCreateManyArgsSchema,
 } from "prisma/generated/zod";
-import type { DataColumns } from "~/types/agsMapping";
+import type { DataColumns } from "~/types/agsMappingConfig";
 import { prepareAgsZodSchema } from "../zod";
 
 export class LocationMapping extends AgsMapping<
