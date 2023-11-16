@@ -5,8 +5,7 @@ interface Props {
   label: string;
   required: boolean;
 }
-
-export default function ({ id, name, label, required }: Props) {
+const LabelledInput = ({ id, name, label, required }: Props) => {
   return (
     <div>
       <label htmlFor={id} className="mb-1 block font-semibold">
@@ -21,4 +20,6 @@ export default function ({ id, name, label, required }: Props) {
       />
     </div>
   );
-}
+};
+
+export default LabelledInput;

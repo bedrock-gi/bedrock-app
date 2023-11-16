@@ -1,9 +1,9 @@
+import type { ViewState } from "react-map-gl";
 import {
   FullscreenControl,
   Map,
   NavigationControl,
   ScaleControl,
-  ViewState,
 } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 

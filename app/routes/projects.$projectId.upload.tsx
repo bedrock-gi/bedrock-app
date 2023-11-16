@@ -1,4 +1,4 @@
-import type { LoaderArgs, ActionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import {
   unstable_composeUploadHandlers,
   unstable_createMemoryUploadHandler,
@@ -8,13 +8,12 @@ import {
 import { Form } from "@remix-run/react";
 import { redirect, typedjson } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
-
 import { createWriteStream } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { createAgsUpload } from "~/models/prisma/agsUploads";
 import invariant from "tiny-invariant";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
@@ -23,7 +22,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return typedjson({ role });
 };
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   invariant(params.projectId);
   const role = await requireUserProjectRole(request, params.projectId);
   invariant(role);

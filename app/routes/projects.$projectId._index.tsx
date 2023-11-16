@@ -1,5 +1,5 @@
 import type { Location } from "@prisma/client";
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
@@ -18,7 +18,7 @@ const locationTableConfig = new TableConfig<Location>(
   locationMapping
 );
 
-export async function loader({ params, request }: LoaderArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);

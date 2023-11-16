@@ -1,4 +1,4 @@
-import { Project, Location } from "@prisma/client";
+import type { Project, Location } from "@prisma/client";
 import { Marker } from "react-map-gl";
 import { geoMidpoint } from "~/utils/calc";
 import { MapView } from "./Map";

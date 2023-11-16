@@ -1,4 +1,4 @@
-import { Location } from "@prisma/client";
+import type { Location } from "@prisma/client";
 import { Marker } from "react-map-gl";
 import { geoMidpoint } from "~/utils/calc";
 import { MapView } from "./Map";
@@ -13,8 +13,8 @@ export function LocationsMap({ locations }: Props) {
   const markers = locations.map((location) => (
     <Marker
       key={location.id}
-      latitude={location.latitude}
-      longitude={location.longitude}
+      latitude={location.latitude ?? 0}
+      longitude={location.longitude ?? 0}
       style={{ width: "100px", height: "100px" }}
     ></Marker>
   ));

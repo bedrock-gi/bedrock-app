@@ -7,6 +7,7 @@ import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
 
 import { Sidebar } from "./components/Sidebar";
+import { useState } from "react";
 
 export interface BreadcrumbData {
   route: string;
@@ -18,10 +19,8 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
-if (process.env.NODE_ENV === "development") {
-} else {
-}
 export default function App() {
+  const [isSidebarExpanded, setSidebarExpanded] = useState(true);
   return (
     <html data-theme="bedrock" lang="en" className="h-full">
       <head>
@@ -33,16 +32,23 @@ export default function App() {
       </head>
 
       <body>
-        <ToastContainer />
-        <div className="flex h-screen flex-row">
-          <div className="h-full w-1/5">
-            <Sidebar></Sidebar>
+        <div className="flex h-screen">
+          <div
+            className={`flex-shrink-0 transition-all duration-300 ${
+              isSidebarExpanded ? "w-64" : "w-16"
+            }`}
+          >
+            <Sidebar
+              isExpanded={isSidebarExpanded}
+              toggle={() => setSidebarExpanded(!isSidebarExpanded)}
+            />
           </div>
 
-          <div className="h-full w-4/5">
+          <div className="h-full flex-grow">
             <Outlet />
           </div>
         </div>
+        <ToastContainer />
         <Scripts />
       </body>
     </html>

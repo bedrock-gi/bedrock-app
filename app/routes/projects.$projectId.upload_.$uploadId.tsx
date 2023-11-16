@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
@@ -12,7 +12,7 @@ import { Form, useActionData, useNavigate } from "@remix-run/react";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import invariant from "tiny-invariant";
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
@@ -33,7 +33,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   return typedjson({ role, upload, parsed });
 };
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);

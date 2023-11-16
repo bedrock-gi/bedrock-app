@@ -1,11 +1,10 @@
-import type { LoaderArgs } from "@remix-run/node";
-import type { RouteMatch } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet } from "@remix-run/react";
 import { typedjson } from "remix-typedjson";
 import invariant from "tiny-invariant";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.projectId);
 
   const role = await requireUserProjectRole(request, params.projectId);
@@ -15,7 +14,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 };
 
 export const handle = {
-  breadcrumb: (match: RouteMatch) => {
+  breadcrumb: (match: any) => {
     console.log(match);
     return (
       <Link to={`/projects/${match.data.project.id}`}>
