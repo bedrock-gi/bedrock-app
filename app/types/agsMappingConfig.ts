@@ -29,7 +29,7 @@ type AgsUploadRecords<
   M extends AgsMapping<T, any, any>
 > = {
   newRecords: IncomingRecord<M>[];
-  updatedRecords: T[];
+  updatedRecords: IncomingRecord<M>[];
 };
 
 // type to create a union from array of string literals
@@ -81,7 +81,103 @@ export abstract class AgsMapping<
     projectId: string
   ): Promise<void>;
 
-  abstract updateRecords(records: T[]): Promise<void>;
+  async #addIdToFieldsByUniqueConstraints(
+    recordsWithConstraints: Pick<T, this["uniqueConstraint"][number]>[]
+  ): Promise<T[]> {
+    // @ts-ignore
+    const client = prisma[this.prismaLabel];
+
+    const where = {
+      OR: recordsWithConstraints.map((constraint) => {
+        const andClause = this.uniqueConstraint.reduce((acc, key) => {
+          acc[key] = {
+            equals: constraint[key],
+          };
+          return acc;
+        }, {} as any);
+
+        return {
+          AND: andClause,
+        };
+      }),
+    };
+
+    const recordsWithIds = recordsWithConstraints.map(async (record) => {
+      const existingRecord = await client.findUnique({
+        where: this.uniqueConstraint.reduce((acc, key) => {
+          acc[key] = {
+            equals: record[key],
+          };
+          return acc;
+        }, {} as any),
+      });
+
+      return {
+        ...record,
+        id: existingRecord.id,
+      };
+    });
+
+    return await client.findMany({
+      where,
+      include: this.#getIncludeForParentMappings() || undefined,
+    });
+  }
+
+  #getIncludeForParentMappings() {
+    const parentMappings = this.#parentMappings();
+
+    const include = parentMappings.reduceRight((acc, mapping) => {
+      const label = mapping.prismaLabel;
+      const parentLabel = mapping.parentMapping?.prismaLabel;
+
+      if (parentLabel) {
+        acc[label] = {
+          include: {
+            [parentLabel]: true,
+          },
+        };
+      } else {
+        acc[label] = true;
+      }
+
+      return acc;
+    }, {} as any);
+
+    return include;
+  }
+
+  async updateRecords(
+    records: IncomingRecord<this>[],
+    projectId: string
+  ): Promise<void> {
+    const parentMappings = this.#parentMappings();
+
+    let currentMapping: AgsMappingAny | undefined = parentMappings.pop();
+
+    while (currentMapping) {
+      // so current mapping is now the oldest parent
+      // we need to find the records for this mapping
+      // based on the unique constraint for this mapping
+
+      const uniqueConstraint = currentMapping.uniqueConstraint;
+
+      const constraints = records.map((record) =>
+        Object.fromEntries(
+          uniqueConstraint.map((key) => [
+            key,
+            key === "projectId"
+              ? projectId
+              : record[key as keyof IncomingRecord<this>],
+          ])
+        )
+      );
+      const existingRecords =
+        await currentMapping.#findManyRecordsByUniqueConstraint(constraints);
+
+      currentMapping = parentMappings.pop();
+    }
+  }
 
   #parentMappings() {
     let currentMapping: AgsMappingAny | undefined = this.parentMapping;
@@ -247,7 +343,7 @@ export abstract class AgsMapping<
     incomingRecords: IncomingRecord<this>[]
   ) {
     const newRecords: IncomingRecord<this>[] = [];
-    const updatedRecords: T[] = [];
+    const updatedRecords: IncomingRecord<this>[] = [];
 
     incomingRecords.forEach((incomingRecord) => {
       const existingRecord = this.#incomingRecordinExistingRecords(
@@ -256,7 +352,7 @@ export abstract class AgsMapping<
       );
 
       if (existingRecord) {
-        updatedRecords.push(existingRecord);
+        updatedRecords.push(incomingRecord);
         return;
       }
       newRecords.push(incomingRecord);
@@ -281,10 +377,7 @@ export abstract class AgsMapping<
     );
 
     const summary = this.#createAgsUploadRecords(existingRecords, records);
-    console.log("summary", {
-      newrecords: summary.newRecords.length,
-      updatedRecords: summary.updatedRecords.length,
-    });
+
     return summary;
   }
 }
