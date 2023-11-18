@@ -30,18 +30,18 @@ export class LocationMapping extends AgsMapping<
     await prisma.location.createMany(input);
   }
 
-  async updateRecords(records: Location[]) {
-    records.forEach(async (record) => {
-      const location = LocationSchema.parse(record);
+  // async updateRecords(records: Location[]) {
+  //   records.forEach(async (record) => {
+  //     const location = LocationSchema.parse(record);
 
-      await prisma.location.updateMany({
-        where: {
-          id: location.id,
-        },
-        data: location,
-      });
-    });
-  }
+  //     await prisma.location.updateMany({
+  //       where: {
+  //         id: location.id,
+  //       },
+  //       data: location,
+  //     });
+  //   });
+  // }
 
   //
 }

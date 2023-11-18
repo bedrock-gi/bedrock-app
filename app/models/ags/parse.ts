@@ -1,5 +1,8 @@
 import type { GroupRaw, agsType, AgsRaw } from "~/types/ags";
-import type { AgsMapping, ObjectWithStringKeys } from "../../types/agsMapping";
+import type {
+  AgsMapping,
+  ObjectWithStringKeys,
+} from "../../types/agsMappingConfig";
 
 import { parseRecordsToZod } from "./zod";
 

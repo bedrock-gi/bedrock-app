@@ -109,7 +109,7 @@ model Location {
   originatingCompany      String? // Text
   samples                 Sample[]
 
-  @@unique([name, projectId])
+  @@unique([name, projectId], name: "ags")
 }
 
 model Sample {
@@ -155,7 +155,7 @@ model Sample {
   lengthSampleRecovered                   Float? // mm 0DP Length of sample recovered
   particleSizeDistributionAnalysisGeneral ParticleSizeDistributionAnalysisGeneral[]
 
-  @@unique([locationId, sampleUniqueID, sampleType, depthTop, sampleReference])
+  @@unique([locationId, sampleUniqueID, sampleType, depthTop, sampleReference], name: "ags")
 }
 
 model ColumnDefinition {

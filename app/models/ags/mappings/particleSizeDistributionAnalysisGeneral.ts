@@ -33,14 +33,3 @@ class ParticleSizeDistributionAnalysisGeneralMapping extends AgsMapping<
   }
 }
 
-prisma.particleSizeDistributionAnalysisGeneral.create({
-  data: {
-    sample: {
-      connect: {
-        locationId_sampleUniqueID_sampleType_depthTop_sampleReference: {
-          locationId,
-        },
-      },
-    },
-  },
-});

@@ -17,13 +17,6 @@ export type DataColumns<T extends ObjectWithStringKeys> = Omit<
   "createdAt" | "updatedAt" | "id" | "customColumns"
 >;
 
-// type PrismaRecordWithParent<
-//   T extends ObjectWithStringKeys,
-//   K extends AgsMapping<T, any, any>
-// > = T & {
-//   [key: string]: PrismaRecordWithParent<T, K["parentMapping"]> | undefined;
-// };
-
 type AgsUploadRecords<
   T extends ObjectWithStringKeys,
   M extends AgsMapping<T, any, any>
@@ -82,101 +75,92 @@ export abstract class AgsMapping<
   ): Promise<void>;
 
   async #addIdToFieldsByUniqueConstraints(
-    recordsWithConstraints: Pick<T, this["uniqueConstraint"][number]>[]
-  ): Promise<T[]> {
+    recordsWithConstraints: Pick<T, this["uniqueConstraint"][number]>[],
+    idField: keyof OmitFields,
+    removeConstraintFieldsFromRecord: boolean = true
+  ) {
     // @ts-ignore
     const client = prisma[this.prismaLabel];
 
-    const where = {
-      OR: recordsWithConstraints.map((constraint) => {
-        const andClause = this.uniqueConstraint.reduce((acc, key) => {
-          acc[key] = {
-            equals: constraint[key],
-          };
-          return acc;
-        }, {} as any);
-
-        return {
-          AND: andClause,
-        };
-      }),
-    };
-
     const recordsWithIds = recordsWithConstraints.map(async (record) => {
       const existingRecord = await client.findUnique({
-        where: this.uniqueConstraint.reduce((acc, key) => {
-          acc[key] = {
-            equals: record[key],
-          };
-          return acc;
-        }, {} as any),
+        where: {
+          ags: this.uniqueConstraint.reduce((acc, key) => {
+            acc[key] = record[key];
+            return acc;
+          }, {} as any),
+        },
       });
+
+      if (removeConstraintFieldsFromRecord) {
+        this.uniqueConstraint.forEach((key) => {
+          delete record[key];
+        });
+      }
 
       return {
         ...record,
-        id: existingRecord.id,
+        [idField]: existingRecord.id,
       };
     });
 
-    return await client.findMany({
-      where,
-      include: this.#getIncludeForParentMappings() || undefined,
-    });
+    return Promise.all(recordsWithIds);
   }
 
-  #getIncludeForParentMappings() {
-    const parentMappings = this.#parentMappings();
+  // #getIncludeForParentMappings() {
+  //   const parentMappings = this.#parentMappings();
 
-    const include = parentMappings.reduceRight((acc, mapping) => {
-      const label = mapping.prismaLabel;
-      const parentLabel = mapping.parentMapping?.prismaLabel;
+  //   const include = parentMappings.reduceRight((acc, mapping) => {
+  //     const label = mapping.prismaLabel;
+  //     const parentLabel = mapping.parentMapping?.prismaLabel;
 
-      if (parentLabel) {
-        acc[label] = {
-          include: {
-            [parentLabel]: true,
-          },
-        };
-      } else {
-        acc[label] = true;
-      }
+  //     if (parentLabel) {
+  //       acc[label] = {
+  //         include: {
+  //           [parentLabel]: true,
+  //         },
+  //       };
+  //     } else {
+  //       acc[label] = true;
+  //     }
 
-      return acc;
-    }, {} as any);
+  //     return acc;
+  //   }, {} as any);
 
-    return include;
-  }
+  //   return include;
+  // }
 
   async updateRecords(
     records: IncomingRecord<this>[],
     projectId: string
   ): Promise<void> {
     const parentMappings = this.#parentMappings();
+    parentMappings.unshift(this);
 
     let currentMapping: AgsMappingAny | undefined = parentMappings.pop();
+    records = records.map((rec) => {
+      return {
+        ...rec,
+        projectId,
+      };
+    });
 
     while (currentMapping) {
-      // so current mapping is now the oldest parent
-      // we need to find the records for this mapping
-      // based on the unique constraint for this mapping
+      const isThisMapping = currentMapping.prismaLabel === this.prismaLabel;
 
-      const uniqueConstraint = currentMapping.uniqueConstraint;
-
-      const constraints = records.map((record) =>
-        Object.fromEntries(
-          uniqueConstraint.map((key) => [
-            key,
-            key === "projectId"
-              ? projectId
-              : record[key as keyof IncomingRecord<this>],
-          ])
-        )
+      const idLabel = isThisMapping ? "id" : `${currentMapping.prismaLabel}Id`;
+      records = await currentMapping.#addIdToFieldsByUniqueConstraints(
+        records,
+        idLabel,
+        !isThisMapping
       );
-      const existingRecords =
-        await currentMapping.#findManyRecordsByUniqueConstraint(constraints);
 
       currentMapping = parentMappings.pop();
     }
+
+    records.forEach(({ id, ...record }) =>
+      prisma[this.prismaLabel].update({ where: id, data: record })
+    );
   }
 
   #parentMappings() {

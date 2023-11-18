@@ -54,20 +54,20 @@ class SampleMapping extends AgsMapping<
     });
   }
 
-  async updateRecords(records: Sample[]) {
-    const recordsParsed = records.map((record) => SampleSchema.parse(record));
+  // async updateRecords(records: Sample[]) {
+  //   const recordsParsed = records.map((record) => SampleSchema.parse(record));
 
-    await Promise.all(
-      recordsParsed.map(async (record) => {
-        await prisma.sample.update({
-          where: {
-            id: record.id,
-          },
-          data: record,
-        });
-      })
-    );
-  }
+  //   await Promise.all(
+  //     recordsParsed.map(async (record) => {
+  //       await prisma.sample.update({
+  //         where: {
+  //           id: record.id,
+  //         },
+  //         data: record,
+  //       });
+  //     })
+  //   );
+  // }
 }
 
 export const sampleMapping = new SampleMapping(

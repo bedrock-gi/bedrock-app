@@ -103,7 +103,10 @@ export async function uploadToPrismaFromBlob(upload: AgsUpload) {
         upload.projectId
       );
 
-      await tableMapping.mapping.updateRecords(agsUploadGroup.updatedRecords);
+      await tableMapping.mapping.updateRecords(
+        agsUploadGroup.updatedRecords,
+        upload.projectId
+      );
     }
 
     if (tableMapping.children) {
