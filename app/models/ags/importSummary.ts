@@ -102,11 +102,13 @@ export async function uploadToPrismaFromBlob(upload: AgsUpload) {
         agsUploadGroup.newRecords,
         upload.projectId
       );
+      console.log("Created records for", tableMapping.mapping.prismaLabel);
 
       await tableMapping.mapping.updateRecords(
         agsUploadGroup.updatedRecords,
         upload.projectId
       );
+      console.log("Updated records for", tableMapping.mapping.prismaLabel);
     }
 
     if (tableMapping.children) {

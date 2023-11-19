@@ -8,7 +8,7 @@ import { LocationsMap } from "~/components/Map/LocationsMap";
 import { Table } from "~/components/Table/Table";
 import { TableConfig } from "~/components/Table/TableConfig";
 import { locationMapping } from "~/models/ags/mappings/location";
-import { getLocations, seedLocations } from "~/models/prisma/locations";
+import { getLocations } from "~/models/prisma/locations";
 
 import { requireUserProjectRole } from "~/utils/auth.server";
 
@@ -25,9 +25,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   invariant(role);
 
   const locations = await getLocations(params.projectId);
-  if (locations.length === 0) {
-    await seedLocations(params.projectId);
-  }
 
   return typedjson({ locations, role });
 }
