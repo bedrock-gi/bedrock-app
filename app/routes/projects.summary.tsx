@@ -1,11 +1,10 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { requireUser } from "~/utils/auth.server";
 
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import ProjectsMap from "~/components/Map/ProjectsMap";
 import { getProjectsWithLocations } from "~/models/prisma/projects";
-import { ProjectCard } from "~/components/Project/ProjectCard";
 
 export const loader = (async ({ request }) => {
   const user = await requireUser(request);
@@ -17,6 +16,7 @@ export const loader = (async ({ request }) => {
 
 export default function () {
   const { projects } = useTypedLoaderData<typeof loader>();
+  const navigator = useNavigate();
 
   return (
     <div className="grid grid-cols-2 justify-center">
@@ -35,10 +35,27 @@ export default function () {
             className="input input-bordered max-w-xs"
           />
         </div>
-        <div className="m-3 grid grid-cols-2 justify-center gap-2 ">
-          {projects.map((project) => (
-            <ProjectCard project={project} key={project.id} />
-          ))}
+        <div>
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projects.map((project) => (
+                <tr
+                  className="hover cursor-pointer"
+                  key={project.id}
+                  onClick={() => navigator(`../${project.id}`)}
+                >
+                  <td>{project.name}</td>
+                  <td>{project.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
