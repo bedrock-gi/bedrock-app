@@ -69,10 +69,17 @@ export abstract class AgsMapping<
     this.zodSchema = zodSchema;
   }
 
-  abstract createRecords(
-    records: DataColumns<T>[],
-    projectId: string
-  ): Promise<void>;
+  async createRecords(records: IncomingRecord<this>[], projectId: string) {
+    const parentMappings = this.#parentMappings();
+
+    const preparedRecords = await this.prepareWriteData(
+      records,
+      parentMappings,
+      projectId
+    );
+
+    prisma[this.prismaLabel].createMany({ data: preparedRecords });
+  }
 
   async #addIdToFieldsByUniqueConstraints(
     recordsWithConstraints: Pick<T, this["uniqueConstraint"][number]>[],
@@ -137,7 +144,24 @@ export abstract class AgsMapping<
     const parentMappings = this.#parentMappings();
     parentMappings.unshift(this);
 
-    let currentMapping: AgsMappingAny | undefined = parentMappings.pop();
+    const preparedRecords = await this.prepareWriteData(
+      records,
+      parentMappings,
+      projectId
+    );
+
+    preparedRecords.forEach(({ id, ...record }) =>
+      prisma[this.prismaLabel].update({ where: id, data: record })
+    );
+    console.log("records updated for ", this.prismaLabel);
+  }
+
+  async prepareWriteData(
+    records: IncomingRecord<this>[],
+    mappings: AgsMappingAny[],
+    projectId: string
+  ) {
+    let currentMapping: AgsMappingAny | undefined = mappings.pop();
     records = records.map((rec) => {
       return {
         ...rec,
@@ -155,12 +179,9 @@ export abstract class AgsMapping<
         !isThisMapping
       );
 
-      currentMapping = parentMappings.pop();
+      currentMapping = mappings.pop();
     }
-
-    records.forEach(({ id, ...record }) =>
-      prisma[this.prismaLabel].update({ where: id, data: record })
-    );
+    return records;
   }
 
   #parentMappings() {
