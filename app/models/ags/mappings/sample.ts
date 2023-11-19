@@ -21,54 +21,7 @@ class SampleMapping extends AgsMapping<
   {
     name: string;
   }
-> {
-  async createRecords(records: any[], projectId: string) {
-    const recordsParsed = records.map((record) => this.zodSchema.parse(record));
-
-    const uniqueLocations = [
-      ...new Set(recordsParsed.map((record) => record.name)),
-    ];
-
-    const locations = await prisma.location.findMany({
-      where: {
-        projectId,
-        name: {
-          in: uniqueLocations,
-        },
-      },
-    });
-
-    const locationsByName = Object.fromEntries(
-      locations.map((location) => [location.name, location])
-    );
-
-    const recordsWithLocationId: DataColumns<Sample>[] = recordsParsed.map(
-      ({ name, ...record }) => ({
-        ...record,
-        locationId: locationsByName[name].id,
-      })
-    );
-
-    await prisma.sample.createMany({
-      data: recordsWithLocationId,
-    });
-  }
-
-  async updateRecords(records: Sample[]) {
-    const recordsParsed = records.map((record) => SampleSchema.parse(record));
-
-    await Promise.all(
-      recordsParsed.map(async (record) => {
-        await prisma.sample.update({
-          where: {
-            id: record.id,
-          },
-          data: record,
-        });
-      })
-    );
-  }
-}
+> {}
 
 export const sampleMapping = new SampleMapping(
   ["locationId"],

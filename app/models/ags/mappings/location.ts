@@ -1,13 +1,9 @@
-import { prisma } from "~/db.server";
 import { AgsMapping } from "../../../types/agsMappingConfig";
 
 import type { Location } from "@prisma/client";
 
-import {
-  LocationSchema,
-  LocationCreateManyArgsSchema,
-} from "prisma/generated/zod";
-import type { DataColumns } from "~/types/agsMappingConfig";
+import { LocationSchema } from "prisma/generated/zod";
+
 import { prepareAgsZodSchema } from "../zod";
 
 export class LocationMapping extends AgsMapping<
@@ -17,32 +13,17 @@ export class LocationMapping extends AgsMapping<
   },
   {}
 > {
-  async createRecords(records: DataColumns<Location>[], projectId: string) {
-    const recordsWithProjectId = records.map((record) => ({
-      ...record,
-      projectId,
-    }));
-
-    const input = LocationCreateManyArgsSchema.parse({
-      data: recordsWithProjectId,
-    });
-
-    await prisma.location.createMany(input);
-  }
-
-  async updateRecords(records: Location[]) {
-    records.forEach(async (record) => {
-      const location = LocationSchema.parse(record);
-
-      await prisma.location.updateMany({
-        where: {
-          id: location.id,
-        },
-        data: location,
-      });
-    });
-  }
-
+  // async updateRecords(records: Location[]) {
+  //   records.forEach(async (record) => {
+  //     const location = LocationSchema.parse(record);
+  //     await prisma.location.updateMany({
+  //       where: {
+  //         id: location.id,
+  //       },
+  //       data: location,
+  //     });
+  //   });
+  // }
   //
 }
 
