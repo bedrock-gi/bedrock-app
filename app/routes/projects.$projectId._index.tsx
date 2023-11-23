@@ -30,14 +30,11 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 }
 
 export default function () {
-  const { locations, role } = useTypedLoaderData<typeof loader>();
+  const { locations } = useTypedLoaderData<typeof loader>();
 
   return (
     <div className="grid grid-cols-2">
       <div className="h-screen overflow-scroll">
-        {/* link to upload data  */}
-        <Link to={`/projects/${role.projectId}/upload`}>Upload Data</Link>
-
         <Table tableConfig={locationTableConfig} data={locations} />
       </div>
       <div className="h-screen">

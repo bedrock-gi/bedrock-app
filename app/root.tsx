@@ -6,7 +6,7 @@ import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
 
-import { Sidebar } from "./components/Sidebar";
+import { Sidebar } from "./components/Sidebar/Sidebar";
 import { useState } from "react";
 
 export interface BreadcrumbData {
