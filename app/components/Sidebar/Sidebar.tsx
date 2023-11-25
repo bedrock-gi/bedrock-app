@@ -1,13 +1,7 @@
-import { Link, useMatch, useMatches } from "@remix-run/react";
-import {
-  MdClose,
-  MdMenu,
-  MdArrowBack,
-  MdUpload,
-  MdSummarize,
-  MdHome,
-  MdMap,
-} from "react-icons/md";
+import { useMatches } from "@remix-run/react";
+import { MdClose, MdMenu } from "react-icons/md";
+import ProjectSidebar from "./ProjectSidebar";
+import HomeSidebar from "./HomeSidebar";
 
 type Props = {
   isExpanded: boolean;
@@ -20,8 +14,8 @@ export function Sidebar({ isExpanded, toggle }: Props) {
   const projectMatch = matches.find(
     (m) => m.id === "routes/projects.$projectId"
   );
-  const projectdata = projectMatch?.data;
-  const projectid = projectMatch?.params.projectId;
+
+  const projectId = projectMatch?.params.projectId;
 
   return (
     <div className="h-full bg-base-200 transition-all duration-300">
@@ -35,35 +29,14 @@ export function Sidebar({ isExpanded, toggle }: Props) {
         </button>
       </div>
 
-      {isExpanded && projectMatch !== undefined && (
+      {isExpanded && projectMatch !== undefined && projectId && (
         // back button
+        <ProjectSidebar projectId={projectId} />
+      )}
 
-        <div>
-          <Link className="btn btn-secondary" to="/projects">
-            <MdArrowBack />
-            Projects
-          </Link>
-          <div className="divider"></div>
-
-          <ul className="menu menu-md w-full bg-base-200">
-            <li className="menu-title">Project Menu</li>
-            <li>
-              <Link to={`projects/${projectid}`}>
-                Summary
-                <MdHome />
-              </Link>
-
-              <Link to={`projects/${projectid}/upload`}>
-                Upload
-                <MdUpload />
-              </Link>
-              <Link to={`projects/${projectid}`}>
-                Mapping
-                <MdMap />
-              </Link>
-            </li>
-          </ul>
-        </div>
+      {isExpanded && !projectMatch && (
+        // back button
+        <HomeSidebar />
       )}
     </div>
   );
