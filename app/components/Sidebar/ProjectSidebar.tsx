@@ -8,10 +8,14 @@ interface Props {
 export default function ProjectSidebar({ projectId }: Props) {
   return (
     <div>
-      <Link className="btn btn-secondary" to="/projects">
-        <MdArrowBack />
-        Projects
-      </Link>
+      <ul className="menu menu-md w-full bg-base-200">
+        <li className="text-secondary">
+          <Link to="/projects">
+            <MdArrowBack />
+            Projects
+          </Link>
+        </li>
+      </ul>
       <div className="divider"></div>
 
       <ul className="menu menu-md w-full bg-base-200">

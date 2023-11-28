@@ -1,7 +1,5 @@
-import { useMatches } from "@remix-run/react";
 import { MdClose, MdMenu } from "react-icons/md";
-import ProjectSidebar from "./ProjectSidebar";
-import HomeSidebar from "./HomeSidebar";
+import { SidebarContent } from "./SidebarContent";
 
 type Props = {
   isExpanded: boolean;
@@ -9,14 +7,6 @@ type Props = {
 };
 
 export function Sidebar({ isExpanded, toggle }: Props) {
-  const matches = useMatches();
-  // console.log(matches);
-  const projectMatch = matches.find(
-    (m) => m.id === "routes/projects.$projectId"
-  );
-
-  const projectId = projectMatch?.params.projectId;
-
   return (
     <div className="h-full bg-base-200 transition-all duration-300">
       <div className="flex w-full justify-between p-4 align-middle">
@@ -25,19 +15,10 @@ export function Sidebar({ isExpanded, toggle }: Props) {
           onClick={toggle}
           className=" justify-self btn rounded-full p-2 hover:bg-base-300"
         >
-          {!isExpanded ? <MdMenu /> : <MdClose />}
+          {isExpanded ? <MdClose /> : <MdMenu />}
         </button>
       </div>
-
-      {isExpanded && projectMatch !== undefined && projectId && (
-        // back button
-        <ProjectSidebar projectId={projectId} />
-      )}
-
-      {isExpanded && !projectMatch && (
-        // back button
-        <HomeSidebar />
-      )}
+      {isExpanded && <SidebarContent />}
     </div>
   );
 }
