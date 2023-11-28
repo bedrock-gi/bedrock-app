@@ -1,6 +1,5 @@
 import type { Location } from "@prisma/client";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link } from "@remix-run/react";
 
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";

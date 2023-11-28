@@ -12,20 +12,7 @@ export class LocationMapping extends AgsMapping<
     projectId: string;
   },
   {}
-> {
-  // async updateRecords(records: Location[]) {
-  //   records.forEach(async (record) => {
-  //     const location = LocationSchema.parse(record);
-  //     await prisma.location.updateMany({
-  //       where: {
-  //         id: location.id,
-  //       },
-  //       data: location,
-  //     });
-  //   });
-  // }
-  //
-}
+> {}
 
 export const locationMapping = new LocationMapping(
   ["projectId"],

@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { MdArrowBack, MdHome, MdGroups } from "react-icons/md";
+import { MdHome, MdGroups } from "react-icons/md";
 
 export default function HomeSidebar() {
   return (
