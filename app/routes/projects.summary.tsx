@@ -5,6 +5,7 @@ import { requireUser } from "~/utils/auth.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import ProjectsMap from "~/components/Map/ProjectsMap";
 import { getProjectsWithLocations } from "~/models/prisma/projects";
+import { MdAdd } from "react-icons/md";
 
 export const loader = (async ({ request }) => {
   const user = await requireUser(request);
@@ -21,14 +22,17 @@ export default function () {
   return (
     <div className="grid grid-cols-2 justify-center">
       <div className="flex h-screen flex-col overflow-y-auto">
-        <h1 className="m-3 text-lg uppercase tracking-wider text-gray-600">
-          Projects
-        </h1>
-
-        <div className="justify-left flex items-center gap-4 px-3">
+        <div className="flex items-center justify-between px-4">
+          <h1 className="m-3 py-4 text-lg uppercase tracking-wider text-primary">
+            Projects
+          </h1>
           <Link className="btn btn-primary" to="/projects/create">
+            <MdAdd className="text-lg" />
             New Project
           </Link>
+        </div>
+
+        <div className="justify-left flex items-center gap-4 px-3">
           <input
             type="text"
             placeholder="Search..."
@@ -39,8 +43,12 @@ export default function () {
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Description</th>
+                <th className="text-xs font-normal uppercase tracking-widest text-gray-400">
+                  Name
+                </th>
+                <th className="text-xs font-normal uppercase tracking-widest text-gray-400">
+                  Description
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -49,6 +57,7 @@ export default function () {
                   className="hover cursor-pointer"
                   key={project.id}
                   onClick={() => navigator(`../${project.id}`)}
+                  role="link"
                 >
                   <td>{project.name}</td>
                   <td>{project.description}</td>
