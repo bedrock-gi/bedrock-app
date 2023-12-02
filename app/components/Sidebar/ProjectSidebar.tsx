@@ -9,7 +9,7 @@ export default function ProjectSidebar({ projectId }: Props) {
   return (
     <div>
       <ul className="menu menu-md w-full bg-base-200">
-        <li className="text-secondary">
+        <li>
           <Link to="/projects">
             <MdArrowBack />
             Projects
