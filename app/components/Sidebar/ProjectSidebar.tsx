@@ -34,7 +34,7 @@ export default function ProjectSidebar({ projectId }: Props) {
             Mapping
             <MdMap />
           </Link>
-          <Link to={`projects/${projectId}`}>
+          <Link to={`projects/${projectId}/tables`}>
             Tables
             <MdGridOn />
           </Link>
