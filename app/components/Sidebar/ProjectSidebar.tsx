@@ -1,15 +1,39 @@
 import { Link } from "@remix-run/react";
 import { MdArrowBack, MdHome, MdUpload, MdMap, MdGridOn } from "react-icons/md";
+import type { SidebarLinkItem } from "~/types/sidebar";
+import { SidebarItems } from "./SidebarItems";
 
 interface Props {
   projectId: string;
 }
 
 export default function ProjectSidebar({ projectId }: Props) {
+  const projectSidebarItems: SidebarLinkItem[] = [
+    {
+      to: `projects/${projectId}`,
+      icon: <MdHome />,
+      label: "Summary",
+    },
+    {
+      to: `projects/${projectId}/upload`,
+      icon: <MdUpload />,
+      label: "Upload",
+    },
+    {
+      to: `projects/${projectId}/mapping`,
+      icon: <MdMap />,
+      label: "Mapping",
+    },
+    {
+      to: `projects/${projectId}/grid`,
+      icon: <MdGridOn />,
+      label: "Grid",
+    },
+  ];
   return (
     <div>
       <ul className="menu menu-md w-full bg-base-200">
-        <li className="text-secondary">
+        <li>
           <Link to="/projects">
             <MdArrowBack />
             Projects
@@ -17,29 +41,7 @@ export default function ProjectSidebar({ projectId }: Props) {
         </li>
       </ul>
       <div className="divider"></div>
-
-      <ul className="menu menu-md w-full bg-base-200">
-        <li className="menu-title">Project Menu</li>
-        <li>
-          <Link to={`projects/${projectId}`}>
-            Summary
-            <MdHome />
-          </Link>
-
-          <Link to={`projects/${projectId}/upload`}>
-            Upload
-            <MdUpload />
-          </Link>
-          <Link to={`projects/${projectId}`}>
-            Mapping
-            <MdMap />
-          </Link>
-          <Link to={`projects/${projectId}/tables`}>
-            Tables
-            <MdGridOn />
-          </Link>
-        </li>
-      </ul>
+      <SidebarItems items={projectSidebarItems} title="Project" />
     </div>
   );
 }

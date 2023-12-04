@@ -9,7 +9,7 @@ type Props = {
 export function Sidebar({ isExpanded, toggle }: Props) {
   return (
     <div className="h-full bg-base-200 transition-all duration-300">
-      <div className="flex w-full justify-between p-4 align-middle">
+      <div className="flex w-full items-center justify-between p-4">
         {isExpanded && <h1 className="text-2xl font-bold">Bedrock</h1>}
         <button
           onClick={toggle}
