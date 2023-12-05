@@ -70,7 +70,6 @@ export abstract class AgsMapping<
   }
 
   async createRecords(records: IncomingRecord<this>[], projectId: string) {
-    console.log("starting create records for ", this.prismaLabel);
     const parentMappings = this.#parentMappings();
 
     const preparedRecords = await this.prepareWriteData(
@@ -79,7 +78,6 @@ export abstract class AgsMapping<
       projectId
     );
 
-    console.log("attempting write for ", this.prismaLabel);
     await prisma[this.prismaLabel].createMany({ data: preparedRecords });
   }
 
@@ -99,13 +97,9 @@ export abstract class AgsMapping<
         }, {} as any),
       };
 
-      console.log("where", where);
-
       const existingRecord = await client.findUnique({
         where,
       });
-
-      console.log("existing record", existingRecord);
 
       if (removeConstraintFieldsFromRecord) {
         this.uniqueConstraint.forEach((key) => {

@@ -6,7 +6,7 @@ type Props = {
   title?: string;
 };
 
-export const SidebarItems = ({ items, title }: Props) => (
+export const SidebarLinkItems = ({ items, title }: Props) => (
   <ul className="menu menu-md w-full bg-base-200">
     {title && <li className="menu-title">{title}</li>}
     <li>

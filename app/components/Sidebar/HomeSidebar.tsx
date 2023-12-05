@@ -1,6 +1,6 @@
 import { MdHome, MdGroups } from "react-icons/md";
 import type { SidebarLinkItem } from "~/types/sidebar";
-import { SidebarItems } from "./SidebarItems";
+import { SidebarLinkItems } from "./SidebarLinkItems";
 
 export default function HomeSidebar() {
   const projectSidebarItems: SidebarLinkItem[] = [
@@ -18,7 +18,7 @@ export default function HomeSidebar() {
 
   return (
     <div>
-      <SidebarItems items={projectSidebarItems} />
+      <SidebarLinkItems items={projectSidebarItems} />
     </div>
   );
 }

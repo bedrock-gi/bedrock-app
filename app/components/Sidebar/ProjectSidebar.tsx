@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import { MdArrowBack, MdHome, MdUpload, MdMap, MdGridOn } from "react-icons/md";
 import type { SidebarLinkItem } from "~/types/sidebar";
-import { SidebarItems } from "./SidebarItems";
+import { SidebarLinkItems } from "./SidebarLinkItems";
 
 interface Props {
   projectId: string;
@@ -25,9 +25,9 @@ export default function ProjectSidebar({ projectId }: Props) {
       label: "Mapping",
     },
     {
-      to: `projects/${projectId}/grid`,
+      to: `projects/${projectId}/tables`,
       icon: <MdGridOn />,
-      label: "Grid",
+      label: "Tables",
     },
   ];
   return (
@@ -41,7 +41,7 @@ export default function ProjectSidebar({ projectId }: Props) {
         </li>
       </ul>
       <div className="divider"></div>
-      <SidebarItems items={projectSidebarItems} title="Project" />
+      <SidebarLinkItems items={projectSidebarItems} title="Project" />
     </div>
   );
 }

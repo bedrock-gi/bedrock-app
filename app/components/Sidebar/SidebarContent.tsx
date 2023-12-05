@@ -14,8 +14,8 @@ export const SidebarContent = () => {
     (m) => m.id === "routes/projects.$projectId.tables"
   );
 
-  if (projectTablesMatch) {
-    return <TableSidebar />;
+  if (projectTablesMatch && projectId) {
+    return <TableSidebar projectId={projectId} />;
   }
 
   if (projectId) {

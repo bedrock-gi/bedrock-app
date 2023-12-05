@@ -1,24 +1,37 @@
 import { Link } from "@remix-run/react";
-import { MdArrowBack, MdHome, MdUpload, MdMap, MdGridOn } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 
-interface Props {}
+import { useEffect } from "react";
+import { useTypedFetcher } from "remix-typedjson";
+import type { loader } from "~/routes/projects.$projectId.tables.sidebar";
+import TableSidebarItems from "./TableSidebarItems";
 
-export default function TableSidebar({}: Props) {
+interface Props {
+  projectId: string;
+}
+
+export default function TableSidebar({ projectId }: Props) {
+  const { load, data } = useTypedFetcher<typeof loader>();
+
+  useEffect(() => {
+    load(`projects/${projectId}/tables/sidebar`);
+  }, [load, projectId]);
+
   return (
     <div>
       <ul className="menu menu-md w-full bg-base-200">
-        <li className="text-secondary">
-          <Link to="/projects">
+        <li>
+          <Link to={`/projects/${projectId}`}>
             <MdArrowBack />
-            Projects
+            Project
           </Link>
         </li>
       </ul>
       <div className="divider"></div>
-
       <ul className="menu menu-md w-full bg-base-200">
-        <li className="menu-title"> Tables</li>
-        <li></li>
+        {data && (
+          <TableSidebarItems sidebarData={data.counts} projectId={projectId} />
+        )}
       </ul>
     </div>
   );

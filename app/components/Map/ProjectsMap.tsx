@@ -30,7 +30,6 @@ export default function ProjectsMap({ projects }: Props) {
     projectsWithMidpointsWithLocations.map((p) => p.midpoint)
   );
 
-  console.log(projectsWithMidpointsWithLocations.map((p) => p.midpoint));
   return (
     <MapView
       viewState={{

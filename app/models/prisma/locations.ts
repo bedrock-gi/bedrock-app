@@ -10,7 +10,17 @@ export async function getLocations(projectId: string) {
   });
 }
 
+export async function getCountPerProject(projectId: string) {
+  return await prisma.location.count({
+    where: {
+      projectId,
+    },
+  });
+}
+
 export const locationTableDataFetcher: TableDataFetcher<Location> = {
   name: "location",
+  label: "Locations",
   findAll: getLocations,
+  getCount: getCountPerProject,
 };

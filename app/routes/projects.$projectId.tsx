@@ -15,7 +15,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export const handle = {
   breadcrumb: (match: any) => {
-    console.log(match);
     return (
       <Link to={`/projects/${match.data.project.id}`}>
         {match.data.project.name}
