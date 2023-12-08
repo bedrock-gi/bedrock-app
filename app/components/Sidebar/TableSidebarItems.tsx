@@ -23,10 +23,14 @@ export default function TableSidebarItems({
       <li>
         <span>
           <Link to={`/projects/${projectId}/tables/${sidebarData.name}`}>
-            <span className={`justify-between  `}>
+            <span>
               {sidebarData.label} ({sidebarData.count}){" "}
             </span>
           </Link>
+
+          {sidebarData.children?.length > 0 && (
+            <div className="divider divider-horizontal"></div>
+          )}
 
           {sidebarData.children?.length > 0 && (
             <button
