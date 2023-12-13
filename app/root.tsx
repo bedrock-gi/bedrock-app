@@ -4,6 +4,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 
+// Import the style only once in your app!
+import "react-datasheet-grid/dist/style.css";
+
 import stylesheet from "~/tailwind.css";
 
 import { Sidebar } from "./components/Sidebar/Sidebar";

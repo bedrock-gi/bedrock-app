@@ -2,6 +2,9 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";
+import Grid from "~/components/Grid/Grid";
+import { Example } from "~/components/Grid/Grid copy";
+
 import { mappings } from "~/models/ags/mappings";
 import { requireUserProjectRole } from "~/utils/auth.server";
 
@@ -11,18 +14,20 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.tableId);
 
   const tableName = params.tableId;
-  const zodSchema = mappings[tableName as keyof typeof mappings].zodSchema;
 
   const role = await requireUserProjectRole(request, params.projectId);
   invariant(role);
+  const cols = mappings[tableName as keyof typeof mappings].getTableColumns();
 
-  return typedjson({ role, tableName, zodSchema });
+  return typedjson({ role, tableName, cols });
 };
 
 export default function () {
-  const { tableName, zodSchema } = useTypedLoaderData<typeof loader>();
+  const { cols } = useTypedLoaderData<typeof loader>();
 
-  console.log("zodSchema", zodSchema);
-
-  return <div></div>;
+  return (
+    <div className="w-full overflow-scroll">
+      <Example></Example>
+    </div>
+  );
 }

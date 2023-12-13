@@ -1,6 +1,7 @@
 import type { ZodPrismaType } from "../models/ags/zod";
 import { prisma } from "~/db.server";
 import set from "set-value";
+import { TableColumn, getBaseType } from "~/models/ags/getTableColumns";
 
 export type ObjectWithStringKeys = {
   [key: string]: any;
@@ -67,6 +68,17 @@ export abstract class AgsMapping<
     this.inheritedFields = inheritedFields;
 
     this.zodSchema = zodSchema;
+  }
+
+  getTableColumns(): TableColumn[] {
+    const shape = this.zodSchema._def.shape();
+    return Object.entries(this.columns).map(([agsColumnName, accessor]) => {
+      return {
+        accessor: accessor as string,
+        label: agsColumnName,
+        type: getBaseType(shape[accessor as string]),
+      };
+    });
   }
 
   async createRecords(records: IncomingRecord<this>[], projectId: string) {
