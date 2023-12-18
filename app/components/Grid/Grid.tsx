@@ -1,70 +1,49 @@
-import { useMemo, useState } from "react";
-import {
-  DataSheetGrid,
-  checkboxColumn,
-  textColumn,
-  keyColumn,
-  Column,
-  dateColumn,
-  floatColumn,
-} from "react-datasheet-grid";
+import "@glideapps/glide-data-grid/dist/index.css";
 
-// Import the style only once in your app!
-import "react-datasheet-grid/dist/style.css";
-import { ZodTypeAny } from "zod";
-import { ColumnType, TableColumn } from "~/models/ags/getTableColumns";
-import { ZodPrismaType } from "~/models/ags/zod";
+import type { GridCell, Item } from "@glideapps/glide-data-grid";
+import DataEditor, { GridCellKind } from "@glideapps/glide-data-grid";
+import type { TableColumn } from "~/models/ags/getTableColumns";
+import type { ObjectWithStringKeys } from "~/types/agsMappingConfig";
+
+const glideModule = require("@glideapps/glide-data-grid");
 
 interface Props {
   cols: TableColumn[];
+  data: ObjectWithStringKeys[];
 }
 
-export default function Grid({ cols }: Props) {
-  const timestamp = new Date().getTime();
-  console.log("rendering grid", timestamp);
+export default function Grid({ cols, data }: Props) {
+  const columns = cols.map((col) => {
+    return {
+      title: col.label ?? col.accessor,
+      width: 100,
+    };
+  });
 
-  const [data, setData] = useState<any[]>([]);
+  const colIndexMap = cols.reduce((acc, col, index) => {
+    acc[index] = col.accessor;
+    return acc;
+  }, {} as { [key: number]: string });
 
-  const columns = useMemo(
-    () =>
-      cols.map((col) => {
-        if (col.type === ColumnType.Boolean)
-          return {
-            ...keyColumn(col.accessor, checkboxColumn),
-            title: col.label,
-            id: col.accessor,
-          };
-        else if (col.type === ColumnType.String)
-          return {
-            ...keyColumn(col.accessor, textColumn),
-            title: col.label,
-            id: col.accessor,
-          };
-        else if (col.type === ColumnType.Number)
-          return {
-            ...keyColumn(col.accessor, floatColumn),
-            title: col.label,
-            id: col.accessor,
-          };
-        else if (col.type === ColumnType.DateTime)
-          return {
-            ...keyColumn(col.accessor, dateColumn),
-            title: col.label,
-            id: col.accessor,
-          };
+  const getCellContent = (cell: Item): GridCell => {
+    const [cellRow, cellCol] = cell;
 
-        return {
-          ...keyColumn(col.accessor, textColumn),
-          title: col.label,
-          id: col.accessor,
-        };
-      }),
-    [cols]
-  );
+    const colName = colIndexMap[cellCol];
+    return {
+      kind: GridCellKind.Text,
+      data: data[cellRow][colName],
+      displayData: data[cellRow][colName],
+      allowOverlay: false,
+    };
+  };
 
   return (
-    <div>
-      <DataSheetGrid columns={columns} value={data} onChange={setData} />;
+    <div className="h-full w-full overflow-scroll">
+      <DataEditor
+        columns={columns}
+        rows={data.length}
+        getCellContent={getCellContent}
+      />
     </div>
   );
 }

@@ -53,6 +53,10 @@ export default function App() {
         </div>
         <ToastContainer />
         <Scripts />
+        <div
+          id="portal"
+          style={{ position: "absolute", top: 0, left: 0, zIndex: 1000 }}
+        />
       </body>
     </html>
   );

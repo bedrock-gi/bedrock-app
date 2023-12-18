@@ -3,7 +3,6 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";
 import Grid from "~/components/Grid/Grid";
-import { Example } from "~/components/Grid/Grid copy";
 
 import { mappings } from "~/models/ags/mappings";
 import { requireUserProjectRole } from "~/utils/auth.server";
@@ -26,8 +25,8 @@ export default function () {
   const { cols } = useTypedLoaderData<typeof loader>();
 
   return (
-    <div className="w-full overflow-scroll">
-      <Example></Example>
+    <div className="h-full w-full overflow-scroll">
+      <Grid cols={cols} data={[]} />
     </div>
   );
 }

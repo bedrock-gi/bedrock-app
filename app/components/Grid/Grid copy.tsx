@@ -9,8 +9,6 @@ import {
   floatColumn,
 } from "react-datasheet-grid";
 
-// Import the style only once in your app!
-import "react-datasheet-grid/dist/style.css";
 import { ZodTypeAny } from "zod";
 import { ColumnType, TableColumn } from "~/models/ags/getTableColumns";
 import { ZodPrismaType } from "~/models/ags/zod";
@@ -26,11 +24,28 @@ export const Example = () => {
   ]);
 
   const columns = [
-    { ...keyColumn("active", checkboxColumn), title: "Active" },
-    { ...keyColumn("firstName", textColumn), title: "First name" },
-    { ...keyColumn("lastName", textColumn), title: "Last name" },
+    {
+      minWidth: 100,
+      maxWidth: 100,
+      ...keyColumn("active", checkboxColumn),
+      title: "Active",
+    },
+    {
+      minWidth: 100,
+      maxWidth: 100,
+      ...keyColumn("firstName", textColumn),
+      title: "First name",
+    },
+    {
+      minWidth: 100,
+      maxWidth: 100,
+      ...keyColumn("lastName", textColumn),
+      title: "Last name",
+    },
     // generate 20 cols
     ...Array.from({ length: 20 }, (_, i) => ({
+      minWidth: 100,
+      maxWidth: 100,
       ...keyColumn(`col${i}`, textColumn),
       title: `Col ${i}`,
     })),
