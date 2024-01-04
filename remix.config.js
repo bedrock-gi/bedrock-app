@@ -2,6 +2,7 @@
 module.exports = {
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*", "**/*.test.{js,jsx,ts,tsx}"],
+  serverDependenciesToBundle: ["@glideapps/glide-data-grid", "remix-utils"],
   postcss: true,
   serverBuildPath: "./build/index.js",
   tailwind: true,

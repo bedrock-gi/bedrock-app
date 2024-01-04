@@ -1,11 +1,10 @@
-import { ObjectWithStringKeys } from "~/types/agsMappingConfig";
-import { ZodPrismaType } from "./zod";
-import { ZodObject, ZodType } from "zod";
+import type { ZodType } from "zod";
+import { GridCellKind } from "@glideapps/glide-data-grid";
 
 export interface TableColumn {
   accessor: string;
   label?: string;
-  type: ColumnType;
+  type: GridCellKind;
 }
 
 export enum ColumnType {
@@ -16,7 +15,7 @@ export enum ColumnType {
   DateTime = "DateTime",
 }
 
-export const getBaseType = (zodSchema: ZodType<any>): ColumnType => {
+export const getBaseType = (zodSchema: ZodType<any>): GridCellKind => {
   // console.log(zodSchema._def);
 
   while (zodSchema._def.innerType) {
@@ -29,15 +28,15 @@ export const getBaseType = (zodSchema: ZodType<any>): ColumnType => {
         (option) => option._def.typeName === "ZodNumber"
       )
     ) {
-      return ColumnType.Number;
+      return GridCellKind.Number;
     } else if (
       zodSchema._def.options.find(
         (option) => option._def.typeName === "ZodDate"
       )
     ) {
-      return ColumnType.DateTime;
+      return GridCellKind.Text;
     }
   }
 
-  return ColumnType.String;
+  return GridCellKind.Text;
 };
